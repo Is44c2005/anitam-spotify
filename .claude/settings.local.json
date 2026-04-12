@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(choco install:*)",
+      "Bash(gh --version)",
+      "Bash(powershell.exe -Command \"gh --version\")",
+      "Bash(powershell.exe:*)",
+      "Bash(git init:*)",
+      "Bash(echo 'node_modules:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
