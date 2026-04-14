@@ -62,13 +62,17 @@ export async function getAllPlaylistTracks(id) {
   let offset = 0;
   let allItems = [];
 
-  while (true) {
-    const page = await getPlaylistTracks(id, PAGE, offset);
-    const items = page?.items || [];
-    allItems = allItems.concat(items);
+  try {
+    while (true) {
+      const page = await getPlaylistTracks(id, PAGE, offset);
+      const items = page?.items || [];
+      allItems = allItems.concat(items);
 
-    if (!page?.next || items.length < PAGE) break;
-    offset += PAGE;
+      if (!page?.next || items.length < PAGE) break;
+      offset += PAGE;
+    }
+  } catch {
+    return allItems;
   }
 
   return allItems;
