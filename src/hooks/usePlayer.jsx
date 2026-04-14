@@ -2,13 +2,13 @@ import { createContext, useContext, useState, useRef, useCallback, useEffect } f
 import { getValidToken, isAuthenticated } from '../utils/spotify';
 
 const PlayerContext = createContext(null);
-
 const BASE = 'https://api.spotify.com/v1';
 
-async function spotifyPut(path, body = null) {
+async function spotifyFetch(path, { method = 'GET', body } = {}) {
   const token = await getValidToken();
+  if (!token) return null;
   return fetch(`${BASE}${path}`, {
-    method: 'PUT',
+    method,
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -20,10 +20,12 @@ async function spotifyPut(path, body = null) {
 export function PlayerProvider({ children }) {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);   // seconds
-  const [duration, setDuration] = useState(0);   // seconds
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [deviceId, setDeviceId] = useState(null);
+  const [volume, setVolumeState] = useState(0.7);
   const [previewMode, setPreviewMode] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
 
   const playerRef = useRef(null);
   const audioRef = useRef(null);
@@ -38,14 +40,11 @@ export function PlayerProvider({ children }) {
 
   function startTick() {
     stopTick();
-    tickRef.current = setInterval(() => {
-      setProgress((p) => p + 1);
-    }, 1000);
+    tickRef.current = setInterval(() => setProgress((p) => p + 1), 1000);
   }
 
   function syncState(state) {
     if (!state) return;
-
     const sdkTrack = state.track_window?.current_track;
     if (sdkTrack) {
       setCurrentTrack({
@@ -60,18 +59,17 @@ export function PlayerProvider({ children }) {
         duration_ms: state.duration,
       });
     }
-
     const nowPlaying = !state.paused;
     setIsPlaying(nowPlaying);
     setProgress(Math.floor(state.position / 1000));
     setDuration(Math.floor(state.duration / 1000));
-
     if (nowPlaying) startTick();
     else stopTick();
   }
 
   function enablePreviewMode() {
     setPreviewMode(true);
+    setSdkReady(false);
     if (playerRef.current) {
       playerRef.current.disconnect();
       playerRef.current = null;
@@ -81,6 +79,7 @@ export function PlayerProvider({ children }) {
   function getAudio() {
     if (!audioRef.current) {
       const audio = new Audio();
+      audio.volume = volume;
       audio.onended = () => {
         setIsPlaying(false);
         stopTick();
@@ -98,30 +97,36 @@ export function PlayerProvider({ children }) {
 
   function initPlayer() {
     if (playerRef.current) return;
-
     const player = new window.Spotify.Player({
       name: 'Spoty ♡',
       getOAuthToken: async (cb) => {
         const t = await getValidToken();
-        cb(t);
+        if (t) cb(t);
       },
-      volume: 0.7,
+      volume,
     });
 
-    player.addListener('ready', ({ device_id }) => {
+    player.addListener('ready', async ({ device_id }) => {
       setDeviceId(device_id);
+      setSdkReady(true);
+      try {
+        await spotifyFetch('/me/player', {
+          method: 'PUT',
+          body: { device_ids: [device_id], play: false },
+        });
+      } catch {
+        // ignore — happens when no active session yet
+      }
     });
 
     player.addListener('not_ready', () => {
-      setDeviceId(null);
+      setSdkReady(false);
     });
 
     player.addListener('player_state_changed', syncState);
-
-    // Si falla por cuenta sin Premium u otro error, activamos modo preview
-    player.addListener('account_error', () => enablePreviewMode());
-    player.addListener('initialization_error', () => enablePreviewMode());
-    player.addListener('authentication_error', () => enablePreviewMode());
+    player.addListener('account_error', enablePreviewMode);
+    player.addListener('initialization_error', enablePreviewMode);
+    player.addListener('authentication_error', enablePreviewMode);
     player.addListener('playback_error', ({ message }) => {
       console.warn('SDK playback error:', message);
     });
@@ -156,15 +161,18 @@ export function PlayerProvider({ children }) {
         audioRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const play = useCallback(async (track) => {
-    // Modo preview: usar preview_url con el elemento Audio
-    if (previewMode || !deviceId) {
+  const play = useCallback(async (track, options = {}) => {
+    if (!track) return;
+
+    if (previewMode || !sdkReady || !deviceId) {
       if (!track.preview_url) return;
       const audio = getAudio();
       audio.src = track.preview_url;
       audio.currentTime = 0;
+      audio.volume = volume;
       setCurrentTrack({ ...track, duration_ms: 30000 });
       setProgress(0);
       setDuration(30);
@@ -174,13 +182,22 @@ export function PlayerProvider({ children }) {
       return;
     }
 
-    // Modo SDK: reproducción completa (requiere Premium)
-    const uri = track.uri || `spotify:track:${track.id}`;
-    await spotifyPut(`/me/player/play?device_id=${deviceId}`, { uris: [uri] });
-  }, [deviceId, previewMode]);
+    const trackUri = track.uri || `spotify:track:${track.id}`;
+    const body = options.contextUri
+      ? { context_uri: options.contextUri, offset: { uri: trackUri } }
+      : { uris: [trackUri] };
+
+    const res = await spotifyFetch(`/me/player/play?device_id=${deviceId}`, {
+      method: 'PUT',
+      body,
+    });
+    if (res && !res.ok && res.status !== 202 && res.status !== 204) {
+      console.warn('Playback request failed:', res.status);
+    }
+  }, [deviceId, sdkReady, previewMode, volume]);
 
   const togglePlay = useCallback(() => {
-    if (previewMode || !deviceId) {
+    if (previewMode || !sdkReady) {
       const audio = audioRef.current;
       if (!audio) return;
       if (audio.paused) {
@@ -195,53 +212,61 @@ export function PlayerProvider({ children }) {
       return;
     }
     playerRef.current?.togglePlay();
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
 
   const pause = useCallback(() => {
-    if (previewMode || !deviceId) {
+    if (previewMode || !sdkReady) {
       audioRef.current?.pause();
       setIsPlaying(false);
       stopTick();
       return;
     }
     playerRef.current?.pause();
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
 
   const resume = useCallback(() => {
-    if (previewMode || !deviceId) {
+    if (previewMode || !sdkReady) {
       audioRef.current?.play().catch(() => {});
       setIsPlaying(true);
       startTick();
       return;
     }
     playerRef.current?.resume();
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
 
   const seek = useCallback((seconds) => {
-    if (previewMode || !deviceId) {
+    if (previewMode || !sdkReady) {
       if (audioRef.current) audioRef.current.currentTime = seconds;
       setProgress(seconds);
       return;
     }
     playerRef.current?.seek(Math.floor(seconds * 1000));
     setProgress(seconds);
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
 
   const previous = useCallback(() => {
-    if (previewMode || !deviceId) return;
+    if (previewMode || !sdkReady) return;
     playerRef.current?.previousTrack();
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
 
   const next = useCallback(() => {
-    if (previewMode || !deviceId) return;
+    if (previewMode || !sdkReady) return;
     playerRef.current?.nextTrack();
-  }, [deviceId, previewMode]);
+  }, [sdkReady, previewMode]);
+
+  const setVolume = useCallback((v) => {
+    const clamped = Math.min(1, Math.max(0, v));
+    setVolumeState(clamped);
+    if (audioRef.current) audioRef.current.volume = clamped;
+    playerRef.current?.setVolume(clamped);
+  }, []);
 
   return (
     <PlayerContext.Provider
       value={{
         currentTrack, isPlaying, progress, duration, deviceId,
-        play, pause, resume, togglePlay, seek, previous, next,
+        volume, sdkReady, previewMode,
+        play, pause, resume, togglePlay, seek, previous, next, setVolume,
       }}
     >
       {children}

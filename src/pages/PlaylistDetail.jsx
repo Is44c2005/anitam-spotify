@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPlaylist, getAllPlaylistTracks, removeTracksFromPlaylist } from '../utils/api';
+import { getPlaylist, getAllPlaylistTracks, removeTracksFromPlaylist, SpotifyApiError } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './PlaylistDetail.module.css';
 
@@ -16,6 +16,7 @@ export default function PlaylistDetail() {
   const [playlist, setPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [restricted, setRestricted] = useState(false);
   const { play, currentTrack, isPlaying } = usePlayer();
 
   useEffect(() => {
@@ -24,6 +25,7 @@ export default function PlaylistDetail() {
 
   async function loadPlaylist() {
     setLoading(true);
+    setRestricted(false);
     try {
       const data = await getPlaylist(id);
       setPlaylist(data);
@@ -34,8 +36,18 @@ export default function PlaylistDetail() {
     try {
       const items = await getAllPlaylistTracks(id);
       setTracks(items);
+      if (items.length === 0) {
+        try {
+          const probe = await getPlaylist(id);
+          if ((probe?.tracks?.total || 0) > 0) setRestricted(true);
+        } catch { /* ignore */ }
+      }
     } catch (err) {
-      console.error('Error loading playlist tracks:', err);
+      if (err instanceof SpotifyApiError && err.status === 403) {
+        setRestricted(true);
+      } else {
+        console.error('Error loading playlist tracks:', err);
+      }
     } finally {
       setLoading(false);
     }
@@ -108,7 +120,7 @@ export default function PlaylistDetail() {
               key={`${track.id}-${i}`}
               className={`${styles.trackItem} ${isCurrent ? styles.active : ''}`}
             >
-              <div className={styles.trackMain} onClick={() => play(track)}>
+              <div className={styles.trackMain} onClick={() => play(track, { contextUri: playlist.uri })}>
                 <span className={styles.trackNum}>{i + 1}</span>
                 {img && <img src={img} alt="" className={styles.trackImg} />}
                 <div className={styles.trackInfo}>
@@ -133,8 +145,20 @@ export default function PlaylistDetail() {
 
       {tracks.length === 0 && (
         <div className={styles.emptyState}>
-          <p>Esta playlist está vacía</p>
-          <p className={styles.emptyHint}>¡Busca canciones para agregar!</p>
+          {restricted ? (
+            <>
+              <p>No puedo mostrar las canciones de esta playlist 😢</p>
+              <p className={styles.emptyHint}>
+                Spotify restringe el acceso a playlists creadas por ellos (Descubrimiento
+                semanal, Radar de novedades, etc.). Prueba con una playlist tuya.
+              </p>
+            </>
+          ) : (
+            <>
+              <p>Esta playlist está vacía</p>
+              <p className={styles.emptyHint}>¡Busca canciones para agregar!</p>
+            </>
+          )}
         </div>
       )}
     </div>

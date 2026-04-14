@@ -1,6 +1,6 @@
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
 const REDIRECT_URI = import.meta.env.VITE_SPOTIFY_REDIRECT_URI;
-const SCOPES = [
+const SCOPE_LIST = [
   'user-read-private',
   'user-read-email',
   'playlist-read-private',
@@ -8,10 +8,16 @@ const SCOPES = [
   'playlist-modify-public',
   'playlist-modify-private',
   'user-library-read',
+  'user-library-modify',
   'streaming',
   'user-read-playback-state',
   'user-modify-playback-state',
-].join(' ');
+  'user-read-currently-playing',
+  'user-read-recently-played',
+  'user-top-read',
+];
+const SCOPES = SCOPE_LIST.join(' ');
+const SCOPES_KEY = 'spotify_granted_scopes';
 
 // PKCE helpers
 function generateRandomString(length) {
@@ -77,6 +83,7 @@ export async function exchangeCodeForToken(code) {
     localStorage.setItem('spotify_access_token', data.access_token);
     localStorage.setItem('spotify_refresh_token', data.refresh_token);
     localStorage.setItem('spotify_token_expires', expiresAt.toString());
+    localStorage.setItem(SCOPES_KEY, data.scope || SCOPES);
     sessionStorage.removeItem('code_verifier');
   }
 
@@ -106,12 +113,24 @@ export async function refreshAccessToken() {
     if (data.refresh_token) {
       localStorage.setItem('spotify_refresh_token', data.refresh_token);
     }
+    if (data.scope) {
+      localStorage.setItem(SCOPES_KEY, data.scope);
+    }
   }
 
   return data;
 }
 
+function hasAllRequiredScopes() {
+  const granted = (localStorage.getItem(SCOPES_KEY) || '').split(/\s+/).filter(Boolean);
+  return SCOPE_LIST.every((s) => granted.includes(s));
+}
+
 export async function getValidToken() {
+  if (localStorage.getItem('spotify_access_token') && !hasAllRequiredScopes()) {
+    logout();
+    return null;
+  }
   const expiresAt = parseInt(localStorage.getItem('spotify_token_expires') || '0');
   if (Date.now() > expiresAt - 60000) {
     const result = await refreshAccessToken();
@@ -128,12 +147,13 @@ export function getStoredToken() {
 }
 
 export function isAuthenticated() {
-  return !!localStorage.getItem('spotify_access_token');
+  return !!localStorage.getItem('spotify_access_token') && hasAllRequiredScopes();
 }
 
 export function logout() {
   localStorage.removeItem('spotify_access_token');
   localStorage.removeItem('spotify_refresh_token');
   localStorage.removeItem('spotify_token_expires');
+  localStorage.removeItem(SCOPES_KEY);
   sessionStorage.setItem('explicit_logout', 'true');
 }

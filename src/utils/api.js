@@ -2,11 +2,19 @@ import { getValidToken, refreshAccessToken, logout } from './spotify';
 
 const BASE = 'https://api.spotify.com/v1';
 
+export class SpotifyApiError extends Error {
+  constructor(message, status) {
+    super(message);
+    this.name = 'SpotifyApiError';
+    this.status = status;
+  }
+}
+
 async function fetchSpotify(endpoint, options = {}, retry = true) {
   const token = await getValidToken();
   if (!token) {
     window.location.href = '/';
-    throw new Error('No token');
+    throw new SpotifyApiError('No token', 401);
   }
 
   const res = await fetch(`${BASE}${endpoint}`, {
@@ -20,21 +28,22 @@ async function fetchSpotify(endpoint, options = {}, retry = true) {
 
   if (res.status === 204) return null;
 
-  // Token expirado o permisos insuficientes: intentar refrescar una vez
-  if ((res.status === 401 || res.status === 403) && retry) {
+  if (res.status === 401 && retry) {
     const refreshed = await refreshAccessToken();
     if (refreshed?.access_token) {
       return fetchSpotify(endpoint, options, false);
     }
-    // El refresh también falló: forzar re-login
     logout();
     window.location.href = '/';
-    return null;
+    throw new SpotifyApiError('Session expired', 401);
   }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || `Spotify API error ${res.status}`);
+    throw new SpotifyApiError(
+      err.error?.message || `Spotify API error ${res.status}`,
+      res.status
+    );
   }
   return res.json();
 }
@@ -59,15 +68,15 @@ export async function getPlaylistTracks(id, limit = 100, offset = 0) {
 
 export async function getAllPlaylistTracks(id) {
   const PAGE = 100;
-  let offset = 0;
-  let allItems = [];
+  const first = await getPlaylistTracks(id, PAGE, 0);
+  let allItems = first?.items || [];
+  let offset = PAGE;
 
   try {
-    while (true) {
+    while (first?.next && allItems.length === offset) {
       const page = await getPlaylistTracks(id, PAGE, offset);
       const items = page?.items || [];
       allItems = allItems.concat(items);
-
       if (!page?.next || items.length < PAGE) break;
       offset += PAGE;
     }
