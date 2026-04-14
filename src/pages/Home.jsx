@@ -146,30 +146,42 @@ export default function Home() {
 
   useEffect(() => {
     async function load() {
+      let playlistItems = [];
+
       try {
         const [userData, playlistData] = await Promise.all([
           getCurrentUser(),
           getUserPlaylists(),
         ]);
         setUser(userData);
-        setPlaylists(playlistData.items || []);
+        playlistItems = playlistData.items || [];
+        setPlaylists(playlistItems);
 
         // Search for "our song"
         const songResult = await searchArtistTrack('Mon Laferte', 'My One and Only Love');
         const song = songResult?.tracks?.items?.[0];
         setOurSong(song || null);
-
-        // Show tracks from the user's first playlist as "recommendations"
-        const firstPlaylist = playlistData.items?.[0];
-        if (firstPlaylist) {
-          const playlistTracks = await getPlaylistTracks(firstPlaylist.id, 10);
-          const tracks = (playlistTracks?.items || [])
-            .map((item) => item.track)
-            .filter(Boolean);
-          setRecommendations(tracks);
-        }
       } catch (err) {
         console.error('Error loading home:', err);
+      }
+
+      // Buscar tracks de recomendaciones probando playlists hasta encontrar una accesible
+      // (separado del try principal para que un 403 no bloquee el resto de la página)
+      try {
+        for (const pl of playlistItems.slice(0, 6)) {
+          try {
+            const result = await getPlaylistTracks(pl.id, 10);
+            const tracks = (result?.items || []).map((item) => item.track).filter(Boolean);
+            if (tracks.length > 0) {
+              setRecommendations(tracks);
+              break;
+            }
+          } catch {
+            // Esta playlist no es accesible, probar la siguiente
+          }
+        }
+      } catch {
+        // Sin recomendaciones disponibles
       } finally {
         setLoading(false);
       }

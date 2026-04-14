@@ -23,8 +23,10 @@ export function PlayerProvider({ children }) {
   const [progress, setProgress] = useState(0);   // seconds
   const [duration, setDuration] = useState(0);   // seconds
   const [deviceId, setDeviceId] = useState(null);
+  const [previewMode, setPreviewMode] = useState(false);
 
   const playerRef = useRef(null);
+  const audioRef = useRef(null);
   const tickRef = useRef(null);
 
   function stopTick() {
@@ -68,6 +70,32 @@ export function PlayerProvider({ children }) {
     else stopTick();
   }
 
+  function enablePreviewMode() {
+    setPreviewMode(true);
+    if (playerRef.current) {
+      playerRef.current.disconnect();
+      playerRef.current = null;
+    }
+  }
+
+  function getAudio() {
+    if (!audioRef.current) {
+      const audio = new Audio();
+      audio.onended = () => {
+        setIsPlaying(false);
+        stopTick();
+      };
+      audio.ontimeupdate = () => {
+        setProgress(Math.floor(audio.currentTime));
+        if (audio.duration && isFinite(audio.duration)) {
+          setDuration(Math.floor(audio.duration));
+        }
+      };
+      audioRef.current = audio;
+    }
+    return audioRef.current;
+  }
+
   function initPlayer() {
     if (playerRef.current) return;
 
@@ -89,6 +117,14 @@ export function PlayerProvider({ children }) {
     });
 
     player.addListener('player_state_changed', syncState);
+
+    // Si falla por cuenta sin Premium u otro error, activamos modo preview
+    player.addListener('account_error', () => enablePreviewMode());
+    player.addListener('initialization_error', () => enablePreviewMode());
+    player.addListener('authentication_error', () => enablePreviewMode());
+    player.addListener('playback_error', ({ message }) => {
+      console.warn('SDK playback error:', message);
+    });
 
     player.connect();
     playerRef.current = player;
@@ -115,39 +151,91 @@ export function PlayerProvider({ children }) {
         playerRef.current.disconnect();
         playerRef.current = null;
       }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
     };
   }, []);
 
   const play = useCallback(async (track) => {
-    if (!deviceId) return;
+    // Modo preview: usar preview_url con el elemento Audio
+    if (previewMode || !deviceId) {
+      if (!track.preview_url) return;
+      const audio = getAudio();
+      audio.src = track.preview_url;
+      audio.currentTime = 0;
+      setCurrentTrack({ ...track, duration_ms: 30000 });
+      setProgress(0);
+      setDuration(30);
+      setIsPlaying(true);
+      startTick();
+      audio.play().catch(() => {});
+      return;
+    }
+
+    // Modo SDK: reproducción completa (requiere Premium)
     const uri = track.uri || `spotify:track:${track.id}`;
     await spotifyPut(`/me/player/play?device_id=${deviceId}`, { uris: [uri] });
-  }, [deviceId]);
+  }, [deviceId, previewMode]);
 
   const togglePlay = useCallback(() => {
+    if (previewMode || !deviceId) {
+      const audio = audioRef.current;
+      if (!audio) return;
+      if (audio.paused) {
+        audio.play().catch(() => {});
+        setIsPlaying(true);
+        startTick();
+      } else {
+        audio.pause();
+        setIsPlaying(false);
+        stopTick();
+      }
+      return;
+    }
     playerRef.current?.togglePlay();
-  }, []);
+  }, [deviceId, previewMode]);
 
   const pause = useCallback(() => {
+    if (previewMode || !deviceId) {
+      audioRef.current?.pause();
+      setIsPlaying(false);
+      stopTick();
+      return;
+    }
     playerRef.current?.pause();
-  }, []);
+  }, [deviceId, previewMode]);
 
   const resume = useCallback(() => {
+    if (previewMode || !deviceId) {
+      audioRef.current?.play().catch(() => {});
+      setIsPlaying(true);
+      startTick();
+      return;
+    }
     playerRef.current?.resume();
-  }, []);
+  }, [deviceId, previewMode]);
 
   const seek = useCallback((seconds) => {
+    if (previewMode || !deviceId) {
+      if (audioRef.current) audioRef.current.currentTime = seconds;
+      setProgress(seconds);
+      return;
+    }
     playerRef.current?.seek(Math.floor(seconds * 1000));
     setProgress(seconds);
-  }, []);
+  }, [deviceId, previewMode]);
 
   const previous = useCallback(() => {
+    if (previewMode || !deviceId) return;
     playerRef.current?.previousTrack();
-  }, []);
+  }, [deviceId, previewMode]);
 
   const next = useCallback(() => {
+    if (previewMode || !deviceId) return;
     playerRef.current?.nextTrack();
-  }, []);
+  }, [deviceId, previewMode]);
 
   return (
     <PlayerContext.Provider
