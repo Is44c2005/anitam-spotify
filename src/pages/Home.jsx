@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getCurrentUser, getUserPlaylists, searchArtistTrack, getRecommendations } from '../utils/api';
+import { getCurrentUser, getUserPlaylists, searchArtistTrack, getPlaylistTracks } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
@@ -159,10 +159,14 @@ export default function Home() {
         const song = songResult?.tracks?.items?.[0];
         setOurSong(song || null);
 
-        // Get recommendations based on "our song" or top tracks
-        if (song) {
-          const recs = await getRecommendations([song.id], 10);
-          setRecommendations(recs?.tracks || []);
+        // Show tracks from the user's first playlist as "recommendations"
+        const firstPlaylist = playlistData.items?.[0];
+        if (firstPlaylist) {
+          const playlistTracks = await getPlaylistTracks(firstPlaylist.id, 10);
+          const tracks = (playlistTracks?.items || [])
+            .map((item) => item.track)
+            .filter(Boolean);
+          setRecommendations(tracks);
         }
       } catch (err) {
         console.error('Error loading home:', err);

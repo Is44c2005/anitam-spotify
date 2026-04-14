@@ -36,22 +36,16 @@ export async function getPlaylist(id) {
 }
 
 export async function getPlaylistTracks(id, limit = 100) {
-  return fetchSpotify(`/playlists/${id}/tracks?limit=${limit}`);
+  return fetchSpotify(`/playlists/${id}/tracks?limit=${parseInt(limit, 10)}`);
 }
 
-export async function searchTracks(query, limit = 20) {
-  return fetchSpotify(`/search?q=${encodeURIComponent(query)}&type=track&limit=${limit}`);
+export async function searchTracks(query, limit = 10) {
+  return fetchSpotify(`/search?q=${encodeURIComponent(query)}&type=track&limit=${parseInt(limit, 10)}`);
 }
 
 export async function searchArtistTrack(artist, track) {
   return fetchSpotify(
     `/search?q=${encodeURIComponent(`artist:${artist} track:${track}`)}&type=track&limit=1`
-  );
-}
-
-export async function getRecommendations(seedTrackIds, limit = 20) {
-  return fetchSpotify(
-    `/recommendations?seed_tracks=${seedTrackIds.join(',')}&limit=${limit}`
   );
 }
 
