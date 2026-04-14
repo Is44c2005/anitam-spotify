@@ -38,6 +38,9 @@ export async function redirectToSpotifyAuth() {
 
   sessionStorage.setItem('code_verifier', codeVerifier);
 
+  const wasLoggedOut = sessionStorage.getItem('explicit_logout') === 'true';
+  sessionStorage.removeItem('explicit_logout');
+
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: CLIENT_ID,
@@ -45,6 +48,7 @@ export async function redirectToSpotifyAuth() {
     redirect_uri: REDIRECT_URI,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
+    ...(wasLoggedOut && { show_dialog: 'true' }),
   });
 
   window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
@@ -130,4 +134,5 @@ export function logout() {
   localStorage.removeItem('spotify_access_token');
   localStorage.removeItem('spotify_refresh_token');
   localStorage.removeItem('spotify_token_expires');
+  sessionStorage.setItem('explicit_logout', 'true');
 }
