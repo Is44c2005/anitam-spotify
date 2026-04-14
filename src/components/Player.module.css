@@ -77,6 +77,9 @@
 }
 
 .controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   flex-shrink: 0;
 }
 
@@ -96,6 +99,21 @@
 .controlBtn:hover {
   transform: scale(1.08);
   box-shadow: 0 4px 20px rgba(245, 175, 175, 0.6);
+}
+
+.controlBtnSmall {
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.controlBtnSmall:hover {
+  background: transparent;
+  color: var(--accent-main);
+  box-shadow: none;
+  transform: scale(1.12);
 }
 
 .time {

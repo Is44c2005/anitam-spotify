@@ -8,7 +8,7 @@ function formatTime(seconds) {
 }
 
 export default function Player() {
-  const { currentTrack, isPlaying, progress, duration, togglePlay, seek } = usePlayer();
+  const { currentTrack, isPlaying, progress, duration, togglePlay, seek, previous, next } = usePlayer();
 
   if (!currentTrack) return null;
 
@@ -39,7 +39,13 @@ export default function Player() {
         </div>
 
         <div className={styles.controls}>
-          <button className={styles.controlBtn} onClick={togglePlay}>
+          <button className={`${styles.controlBtn} ${styles.controlBtnSmall}`} onClick={previous} title="Anterior">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
+            </svg>
+          </button>
+
+          <button className={styles.controlBtn} onClick={togglePlay} title={isPlaying ? 'Pausar' : 'Reproducir'}>
             {isPlaying ? (
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                 <rect x="6" y="4" width="4" height="16" rx="1" />
@@ -50,6 +56,12 @@ export default function Player() {
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
+          </button>
+
+          <button className={`${styles.controlBtn} ${styles.controlBtnSmall}`} onClick={next} title="Siguiente">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM16 6h2v12h-2z" />
+            </svg>
           </button>
         </div>
 
