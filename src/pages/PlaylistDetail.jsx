@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getPlaylist, removeTracksFromPlaylist } from '../utils/api';
+import { getPlaylist, getAllPlaylistTracks, removeTracksFromPlaylist } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './PlaylistDetail.module.css';
 
@@ -14,6 +14,7 @@ export default function PlaylistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [playlist, setPlaylist] = useState(null);
+  const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { play, currentTrack, isPlaying } = usePlayer();
 
@@ -24,8 +25,12 @@ export default function PlaylistDetail() {
   async function loadPlaylist() {
     setLoading(true);
     try {
-      const data = await getPlaylist(id);
+      const [data, items] = await Promise.all([
+        getPlaylist(id),
+        getAllPlaylistTracks(id),
+      ]);
       setPlaylist(data);
+      setTracks(items);
     } catch (err) {
       console.error('Error loading playlist:', err);
     } finally {
@@ -36,7 +41,7 @@ export default function PlaylistDetail() {
   async function handleRemoveTrack(trackUri) {
     try {
       await removeTracksFromPlaylist(id, [trackUri]);
-      await loadPlaylist();
+      setTracks((prev) => prev.filter((item) => item.track?.uri !== trackUri));
     } catch (err) {
       console.error('Error removing track:', err);
     }
@@ -59,7 +64,6 @@ export default function PlaylistDetail() {
   }
 
   const image = playlist.images?.[0]?.url;
-  const tracks = playlist.tracks?.items || [];
 
   return (
     <div className={styles.container}>
@@ -92,7 +96,7 @@ export default function PlaylistDetail() {
           const track = item.track;
           if (!track) return null;
 
-          const img = track.album?.images?.[2]?.url;
+          const img = track.album?.images?.[2]?.url || track.album?.images?.[0]?.url;
           const artist = track.artists?.map((a) => a.name).join(', ');
           const isCurrent = currentTrack?.id === track.id && isPlaying;
 

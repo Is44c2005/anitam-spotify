@@ -35,8 +35,27 @@ export async function getPlaylist(id) {
   return fetchSpotify(`/playlists/${id}`);
 }
 
-export async function getPlaylistTracks(id, limit = 100) {
-  return fetchSpotify(`/playlists/${id}/tracks?limit=${parseInt(limit, 10)}`);
+export async function getPlaylistTracks(id, limit = 100, offset = 0) {
+  return fetchSpotify(
+    `/playlists/${id}/tracks?limit=${parseInt(limit, 10)}&offset=${parseInt(offset, 10)}`
+  );
+}
+
+export async function getAllPlaylistTracks(id) {
+  const PAGE = 100;
+  let offset = 0;
+  let allItems = [];
+
+  while (true) {
+    const page = await getPlaylistTracks(id, PAGE, offset);
+    const items = page?.items || [];
+    allItems = allItems.concat(items);
+
+    if (!page?.next || items.length < PAGE) break;
+    offset += PAGE;
+  }
+
+  return allItems;
 }
 
 export async function searchTracks(query, limit = 10) {
