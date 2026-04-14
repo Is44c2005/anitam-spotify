@@ -25,14 +25,17 @@ export default function PlaylistDetail() {
   async function loadPlaylist() {
     setLoading(true);
     try {
-      const [data, items] = await Promise.all([
-        getPlaylist(id),
-        getAllPlaylistTracks(id),
-      ]);
+      const data = await getPlaylist(id);
       setPlaylist(data);
+    } catch (err) {
+      console.error('Error loading playlist metadata:', err);
+    }
+
+    try {
+      const items = await getAllPlaylistTracks(id);
       setTracks(items);
     } catch (err) {
-      console.error('Error loading playlist:', err);
+      console.error('Error loading playlist tracks:', err);
     } finally {
       setLoading(false);
     }
