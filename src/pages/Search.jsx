@@ -1,114 +1,211 @@
-import { useState, useCallback } from 'react';
-import { searchTracks } from '../utils/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { searchTracks, getCurrentUser } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Search.module.css';
 
-function formatDuration(ms) {
-  const mins = Math.floor(ms / 60000);
-  const secs = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
-  return `${mins}:${secs}`;
+const MOODS = [
+  { label: 'Romántico', query: 'romántico amor', emoji: '♡', cls: 'm1' },
+  { label: 'Pop suave',  query: 'pop suave',      emoji: '🌸', cls: 'm2' },
+  { label: 'Trap',       query: 'trap rap',        emoji: '🔥', cls: 'm3' },
+  { label: 'R&B',        query: 'r&b soul',        emoji: '♫', cls: 'm4' },
+  { label: 'Latin',      query: 'latin pop',       emoji: '🌴', cls: 'm5' },
+  { label: 'Indie',      query: 'indie alternativo',emoji: '🎸', cls: 'm6' },
+];
+
+function msToTime(ms) {
+  if (!ms) return '–';
+  const s = Math.floor(ms / 1000);
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
 export default function Search() {
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [query, setQuery]       = useState('');
+  const [results, setResults]   = useState([]);
+  const [loading, setLoading]   = useState(false);
   const [searched, setSearched] = useState(false);
-  const { play, currentTrack, isPlaying } = usePlayer();
+  const [user, setUser]         = useState(null);
+  const debounceRef             = useRef(null);
+  const navigate                = useNavigate();
 
-  const handleSearch = useCallback(async (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const { play, togglePlay, currentTrack, isPlaying } = usePlayer();
 
+  useEffect(() => {
+    getCurrentUser().then(setUser).catch(() => {});
+  }, []);
+
+  const doSearch = useCallback(async (q) => {
+    if (!q.trim()) { setResults([]); setSearched(false); return; }
     setLoading(true);
     setSearched(true);
     try {
-      const data = await searchTracks(query);
+      const data = await searchTracks(q, 20);
       setResults(data?.tracks?.items || []);
-    } catch (err) {
-      console.error('Search error:', err);
+    } catch {
+      setResults([]);
     } finally {
       setLoading(false);
     }
-  }, [query]);
+  }, []);
+
+  const handleInput = (val) => {
+    setQuery(val);
+    clearTimeout(debounceRef.current);
+    if (!val.trim()) { setResults([]); setSearched(false); return; }
+    debounceRef.current = setTimeout(() => doSearch(val), 400);
+  };
+
+  const handleMood = (mood) => {
+    setQuery(mood.query);
+    doSearch(mood.query);
+  };
+
+  const clearSearch = () => {
+    setQuery('');
+    setResults([]);
+    setSearched(false);
+  };
+
+  const displayName = user?.display_name || '';
+  const avatarUrl   = user?.images?.[0]?.url || null;
+  const initials    = displayName.slice(0, 2).toUpperCase();
+
+  const showMoods   = !searched && results.length === 0;
+  const showEmpty   = searched && !loading && results.length === 0;
+  const showResults = results.length > 0;
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Buscar 🔍</h1>
+    <div className={styles.page}>
+      {/* NAV */}
+      <nav className={styles.nav}>
+        <div className={styles.navLogo}>Anitam Spotify</div>
+        <div className={styles.navLinks}>
+          <span className={styles.navLink} onClick={() => navigate('/home')}>Inicio</span>
+          <span className={`${styles.navLink} ${styles.active}`}>Buscar</span>
+          <span className={styles.navLink} onClick={() => navigate('/playlists')}>Playlists</span>
+        </div>
+        <div className={styles.navProfile}>
+          {avatarUrl
+            ? <img src={avatarUrl} alt={displayName} className={styles.avatarImg} />
+            : <div className={styles.avatar}>{initials}</div>
+          }
+          <span className={styles.navName}>{displayName}</span>
+        </div>
+      </nav>
 
-      <form className={styles.searchForm} onSubmit={handleSearch}>
-        <div className={styles.inputWrapper}>
-          <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8" />
-            <path d="M21 21l-4.35-4.35" />
-          </svg>
+      {/* SEARCH HERO */}
+      <div className={styles.searchHero}>
+        <div className={styles.heroBlob} />
+        <h1 className={styles.searchTitle}>Buscar <em>música</em></h1>
+        <p className={styles.searchSub}>Encuentra cualquier canción, artista o álbum ♡</p>
+        <div className={styles.searchBarWrap}>
+          <span className={styles.searchIcon}>♪</span>
           <input
+            className={styles.searchInput}
             type="text"
-            className={styles.input}
-            placeholder="¿Qué quieres escuchar, amor?"
+            placeholder="¿Qué quieres escuchar hoy?"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleInput(e.target.value)}
+            autoComplete="off"
           />
+          {query && (
+            <button className={styles.clearBtn} onClick={clearSearch}>×</button>
+          )}
         </div>
-        <button type="submit" className={styles.searchBtn} disabled={loading}>
-          {loading ? 'Buscando...' : 'Buscar'}
-        </button>
-      </form>
+      </div>
 
-      {loading && (
-        <div className={styles.loadingState}>
-          <div className={styles.spinner} />
-        </div>
-      )}
-
-      {!loading && searched && results.length === 0 && (
-        <div className={styles.emptyState}>
-          <p>No encontré resultados 😢</p>
-          <p className={styles.emptyHint}>Intenta con otro nombre</p>
-        </div>
-      )}
-
-      {!loading && results.length > 0 && (
-        <div className={styles.results}>
-          {results.map((track) => {
-            const image = track.album?.images?.[2]?.url || track.album?.images?.[0]?.url;
-            const artist = track.artists?.map((a) => a.name).join(', ');
-            const isCurrentlyPlaying = currentTrack?.id === track.id && isPlaying;
-
-            return (
+      {/* MOODS */}
+      {showMoods && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionTitle}>Explorar por estado de ánimo</span>
+          </div>
+          <div className={styles.moodsGrid}>
+            {MOODS.map((m) => (
               <div
-                key={track.id}
-                className={`${styles.trackItem} ${isCurrentlyPlaying ? styles.active : ''}`}
-                onClick={() => play(track)}
+                key={m.cls}
+                className={`${styles.moodCard} ${styles[m.cls]}`}
+                onClick={() => handleMood(m)}
               >
-                <div className={styles.trackLeft}>
-                  <div className={styles.trackImgWrapper}>
-                    {image && <img src={image} alt="" className={styles.trackImg} />}
-                    {track.preview_url && (
-                      <div className={styles.playOverlay}>
-                        <span>{isCurrentlyPlaying ? '⏸' : '▶'}</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className={styles.trackInfo}>
-                    <span className={styles.trackName}>{track.name}</span>
-                    <span className={styles.trackArtist}>{artist}</span>
-                  </div>
-                </div>
-                <div className={styles.trackRight}>
-                  <span className={styles.trackAlbum}>{track.album?.name}</span>
-                  <span className={styles.trackDuration}>{formatDuration(track.duration_ms)}</span>
-                </div>
+                <span className={styles.moodEmoji}>{m.emoji}</span>
+                <div className={styles.moodName}>{m.label}</div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       )}
 
-      {!searched && (
+      {/* LOADING */}
+      {loading && (
+        <div className={styles.loadingWrap}>
+          <div className={styles.loadingDots}>
+            <div className={styles.dot} />
+            <div className={styles.dot} />
+            <div className={styles.dot} />
+          </div>
+          <span className={styles.loadingText}>Buscando en Spotify...</span>
+        </div>
+      )}
+
+      {/* RESULTS */}
+      {showResults && !loading && (
+        <div className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionTitle}>Resultados para &ldquo;{query}&rdquo;</span>
+            <span className={styles.sectionCount}>{results.length} canciones</span>
+          </div>
+          <div className={styles.resultsList}>
+            {results.map((track, i) => {
+              const isActive = currentTrack?.id === track.id;
+              const coverUrl = track.album?.images?.[1]?.url || track.album?.images?.[0]?.url;
+              return (
+                <div
+                  key={track.id}
+                  className={`${styles.resultRow} ${isActive ? styles.playing : ''}`}
+                  onClick={() => isActive ? togglePlay() : play(track)}
+                >
+                  <div className={styles.resultNum}>
+                    {isActive && isPlaying
+                      ? <div className={styles.playIndicator}>
+                          <div className={styles.piBar} />
+                          <div className={styles.piBar} />
+                          <div className={styles.piBar} />
+                        </div>
+                      : <span>{i + 1}</span>
+                    }
+                  </div>
+                  {coverUrl
+                    ? <img src={coverUrl} alt={track.name} className={styles.resultCover} />
+                    : <div className={`${styles.resultCover} ${styles.resultCoverPlaceholder}`}>♪</div>
+                  }
+                  <div className={styles.resultInfo}>
+                    <div className={`${styles.resultName} ${isActive ? styles.playingText : ''}`}>
+                      {track.name}
+                    </div>
+                    <div className={styles.resultArtist}>
+                      {track.artists?.map(a => a.name).join(', ')}
+                    </div>
+                  </div>
+                  <div className={styles.resultAlbum}>{track.album?.name}</div>
+                  <div className={styles.resultDuration}>{msToTime(track.duration_ms)}</div>
+                  <button
+                    className={styles.resultAdd}
+                    onClick={(e) => e.stopPropagation()}
+                    title="Agregar a playlist"
+                  >+</button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* EMPTY */}
+      {showEmpty && (
         <div className={styles.emptyState}>
-          <span className={styles.emptyEmoji}>🎵</span>
-          <p>Busca tus canciones favoritas</p>
+          <div className={styles.emptyIcon}>♪</div>
+          <div className={styles.emptyTitle}>Sin resultados</div>
+          <div className={styles.emptySub}>Intenta con otro nombre de canción o artista</div>
         </div>
       )}
     </div>

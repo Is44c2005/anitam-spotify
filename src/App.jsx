@@ -40,7 +40,7 @@ export default function App() {
             path="/search"
             element={
               <ProtectedRoute>
-                <AppLayout><Search /></AppLayout>
+                <Search />
               </ProtectedRoute>
             }
           />
