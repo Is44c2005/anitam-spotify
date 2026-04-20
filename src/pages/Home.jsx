@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCurrentUser } from '../utils/api';
+import { getCurrentUser, searchArtistTrack } from '../utils/api';
+import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
 const START_DATE = new Date('2024-11-24');
@@ -14,21 +15,47 @@ function getMonthsAndDays() {
   return { months, days };
 }
 
+const SONG_DEFS = [
+  { key: 'ourSong',       artist: 'Mon Laferte',   title: 'My One and Only Love' },
+  { key: 'somosDos',      artist: 'Bomba Estereo',  title: 'Somos Dos'            },
+  { key: 'flyLove',       artist: 'Jamie Foxx',     title: 'Fly Love'             },
+  { key: 'circusMaximus', artist: 'Travis Scott',   title: 'Circus Maximus'       },
+];
+
 export default function Home() {
-  const [user, setUser] = useState(null);
+  const [user, setUser]         = useState(null);
   const [showSecret, setShowSecret] = useState(false);
+  const [spotifyTracks, setSpotifyTracks] = useState({});
   const { months, days } = getMonthsAndDays();
   const navigate = useNavigate();
+  const { play, currentTrack, isPlaying } = usePlayer();
 
   useEffect(() => {
-    getCurrentUser()
-      .then((data) => setUser(data))
-      .catch(() => {});
+    getCurrentUser().then(setUser).catch(() => {});
+
+    Promise.allSettled(
+      SONG_DEFS.map(({ artist, title }) => searchArtistTrack(artist, title))
+    ).then((results) => {
+      const found = {};
+      results.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          found[SONG_DEFS[i].key] = result.value?.tracks?.items?.[0] ?? null;
+        }
+      });
+      setSpotifyTracks(found);
+    });
   }, []);
 
   const displayName = user?.display_name || 'Anitam';
-  const avatarUrl = user?.images?.[0]?.url || null;
-  const initials = displayName.slice(0, 2).toUpperCase();
+  const avatarUrl   = user?.images?.[0]?.url || null;
+  const initials    = displayName.slice(0, 2).toUpperCase();
+
+  const ourSong        = spotifyTracks.ourSong;
+  const ourSongPlaying = isPlaying && currentTrack?.id === ourSong?.id;
+
+  function handlePlay(track) {
+    if (track) play(track);
+  }
 
   return (
     <div className={styles.home}>
@@ -74,9 +101,16 @@ export default function Home() {
           <span className={styles.sectionTitle}>Nuestra canción ♡</span>
           <span className={styles.sectionSub}>siempre en repeat</span>
         </div>
-        <div className={styles.ourSong}>
+        <div
+          className={styles.ourSong}
+          onClick={() => handlePlay(ourSong)}
+          style={{ cursor: ourSong ? 'pointer' : 'default' }}
+        >
           <div className={styles.ourSongGlow} />
-          <div className={styles.ourSongVinyl}>
+          <div
+            className={styles.ourSongVinyl}
+            style={{ animationDuration: ourSongPlaying ? '1.2s' : '5s' }}
+          >
             <div className={styles.ourSongVinylCenter} />
           </div>
           <div className={styles.ourSongInfo}>
@@ -99,24 +133,34 @@ export default function Home() {
           <span className={styles.sectionSub}>solo las nuestras</span>
         </div>
         <div className={styles.songsGrid}>
-          <div className={styles.songCard}>
-            <div className={`${styles.songCardCover} ${styles.sc1}`}>♪</div>
-            <div className={styles.songCardName}>My One and Only Love</div>
-            <div className={styles.songCardArtist}>Mon Laferte</div>
-            <div className={styles.songCardPill}>nuestra ♡</div>
-          </div>
-          <div className={styles.songCard}>
-            <div className={`${styles.songCardCover} ${styles.sc2}`}>♪</div>
-            <div className={styles.songCardName}>Somos Dos</div>
-            <div className={styles.songCardArtist}>Bomba Estéreo</div>
-            <div className={styles.songCardPill}>nos recuerda</div>
-          </div>
-          <div className={styles.songCard}>
-            <div className={`${styles.songCardCover} ${styles.sc3}`}>♪</div>
-            <div className={styles.songCardName}>Fly Love</div>
-            <div className={styles.songCardArtist}>Jamie Foxx</div>
-            <div className={styles.songCardPill}>la pienso en ti</div>
-          </div>
+          {[
+            { key: 'ourSong',  label: 'nuestra ♡',   fallbackColor: styles.sc1, fallbackEmoji: '♪' },
+            { key: 'somosDos', label: 'nos recuerda', fallbackColor: styles.sc2, fallbackEmoji: '♪' },
+            { key: 'flyLove',  label: 'la pienso en ti', fallbackColor: styles.sc3, fallbackEmoji: '♪' },
+          ].map(({ key, label, fallbackColor, fallbackEmoji }) => {
+            const track   = spotifyTracks[key];
+            const coverUrl = track?.album?.images?.[0]?.url;
+            const name     = track?.name     || (key === 'ourSong' ? 'My One and Only Love' : key === 'somosDos' ? 'Somos Dos' : 'Fly Love');
+            const artist   = track?.artists?.[0]?.name || (key === 'ourSong' ? 'Mon Laferte' : key === 'somosDos' ? 'Bomba Estéreo' : 'Jamie Foxx');
+            const active   = isPlaying && currentTrack?.id === track?.id;
+
+            return (
+              <div
+                key={key}
+                className={`${styles.songCard} ${active ? styles.songCardActive : ''}`}
+                onClick={() => handlePlay(track)}
+                style={{ cursor: track ? 'pointer' : 'default' }}
+              >
+                {coverUrl
+                  ? <img src={coverUrl} alt={name} className={styles.songCardImg} />
+                  : <div className={`${styles.songCardCover} ${fallbackColor}`}>{fallbackEmoji}</div>
+                }
+                <div className={styles.songCardName}>{name}</div>
+                <div className={styles.songCardArtist}>{artist}</div>
+                <div className={styles.songCardPill}>{label}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -149,23 +193,37 @@ export default function Home() {
           <span className={styles.sectionTitle}>Lo que escuchas este mes</span>
           <span className={styles.sectionSub}>en repeat ahora mismo</span>
         </div>
-        <div className={styles.monthCard}>
-          <div className={styles.monthCover}>🌙</div>
-          <div className={styles.monthInfo}>
-            <div className={styles.monthBadge}>🔥 del mes</div>
-            <div className={styles.monthName}>Circus Maximus</div>
-            <div className={styles.monthArtist}>Travis Scott</div>
-          </div>
-          <div className={styles.monthWave}>
-            {[8, 18, 12, 18].map((h, i) => (
-              <div
-                key={i}
-                className={styles.mbar}
-                style={{ height: h, animationDelay: `${i * 0.08}s` }}
-              />
-            ))}
-          </div>
-        </div>
+        {(() => {
+          const track    = spotifyTracks.circusMaximus;
+          const coverUrl = track?.album?.images?.[0]?.url;
+          const active   = isPlaying && currentTrack?.id === track?.id;
+          return (
+            <div
+              className={`${styles.monthCard} ${active ? styles.monthCardActive : ''}`}
+              onClick={() => handlePlay(track)}
+              style={{ cursor: track ? 'pointer' : 'default' }}
+            >
+              {coverUrl
+                ? <img src={coverUrl} alt="Circus Maximus" className={styles.monthCoverImg} />
+                : <div className={styles.monthCover}>🌙</div>
+              }
+              <div className={styles.monthInfo}>
+                <div className={styles.monthBadge}>🔥 del mes</div>
+                <div className={styles.monthName}>Circus Maximus</div>
+                <div className={styles.monthArtist}>Travis Scott</div>
+              </div>
+              <div className={styles.monthWave}>
+                {[8, 18, 12, 18].map((h, i) => (
+                  <div
+                    key={i}
+                    className={styles.mbar}
+                    style={{ height: h, animationDelay: `${i * 0.08}s` }}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* FOOTER */}
