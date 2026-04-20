@@ -1,216 +1,194 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getCurrentUser, getUserPlaylists, searchArtistTrack, getPlaylistTracks } from '../utils/api';
-import { usePlayer } from '../hooks/usePlayer';
+import { useNavigate } from 'react-router-dom';
+import { getCurrentUser } from '../utils/api';
 import styles from './Home.module.css';
 
-function RomanticCounter({ startDate }) {
-  const [showModal, setShowModal] = useState(false);
+const START_DATE = new Date('2024-11-24');
 
+function getMonthsAndDays() {
   const now = new Date();
-  const start = new Date(startDate);
-  let months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-  if (now.getDate() < start.getDate()) months--;
-
-  const totalDays = Math.floor((now - start) / (1000 * 60 * 60 * 24));
-
-  return (
-    <>
-      <div className={styles.counter} onClick={() => setShowModal(true)}>
-        <span className={styles.counterHeart}>♡</span>
-        <span>Llevamos <strong>{months} meses</strong> y <strong>{totalDays} días</strong> juntos ♡</span>
-        <span className={styles.counterHeart}>♡</span>
-      </div>
-
-      {showModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={() => setShowModal(false)}>×</button>
-            <div className={styles.modalContent}>
-              <span className={styles.modalEmoji}>💕</span>
-              <h3>Para mi Ana Sofía</h3>
-              <p>
-                Cada día a tu lado es el mejor regalo que la vida me ha dado.
-                Eres mi canción favorita, la melodía que le da sentido a todo.
-                Te amo más de lo que las palabras pueden expresar,
-                más de lo que cualquier canción podría cantar.
-              </p>
-              <p className={styles.modalSignature}>
-                — Tu novio, que te ama con locura 🎀
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-function OurSong({ track, onPlay }) {
-  if (!track) return null;
-
-  const image = track.album?.images?.[0]?.url;
-  const artist = track.artists?.map((a) => a.name).join(', ');
-
-  return (
-    <div className={styles.heroSong}>
-      <h2 className={styles.heroTitle}>Nuestra canción ♡</h2>
-      <div className={styles.songCard} onClick={() => onPlay(track)}>
-        <div className={styles.songImageWrapper}>
-          {image && <img src={image} alt={track.name} className={styles.songImage} />}
-          <div className={styles.heartOverlay}>
-            <span className={styles.heartBeat}>❤️</span>
-          </div>
-        </div>
-        <div className={styles.songInfo}>
-          <h3 className={styles.songName}>{track.name}</h3>
-          <p className={styles.songArtist}>{artist}</p>
-          <button className={styles.playBtn}>
-            {track.preview_url ? '▶ Escuchar preview' : '♪ Nuestra canción'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PlaylistGrid({ playlists }) {
-  if (!playlists?.length) return null;
-
-  return (
-    <div className={styles.section}>
-      <div className={styles.sectionHeader}>
-        <h2>Tus Playlists 🎵</h2>
-        <Link to="/playlists" className={styles.seeAll}>Ver todas →</Link>
-      </div>
-      <div className={styles.grid}>
-        {playlists.slice(0, 8).map((pl) => (
-          <Link to={`/playlists/${pl.id}`} key={pl.id} className={styles.card}>
-            <div className={styles.cardImageWrapper}>
-              <img
-                src={pl.images?.[0]?.url || '/placeholder.svg'}
-                alt={pl.name}
-                className={styles.cardImage}
-              />
-              <div className={styles.cardOverlay}>
-                <span className={styles.cardPlay}>▶</span>
-              </div>
-            </div>
-            <h4 className={styles.cardTitle}>{pl.name}</h4>
-            <p className={styles.cardSub}>{pl.tracks?.total || 0} canciones</p>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function RecommendedTracks({ tracks, onPlay }) {
-  if (!tracks?.length) return null;
-
-  return (
-    <div className={styles.section}>
-      <h2 className={styles.sectionTitle}>Recomendadas para ti 💫</h2>
-      <div className={styles.trackList}>
-        {tracks.map((track, i) => {
-          const image = track.album?.images?.[2]?.url || track.album?.images?.[0]?.url;
-          const artist = track.artists?.map((a) => a.name).join(', ');
-          const mins = Math.floor(track.duration_ms / 60000);
-          const secs = Math.floor((track.duration_ms % 60000) / 1000).toString().padStart(2, '0');
-
-          return (
-            <div key={track.id} className={styles.trackItem} onClick={() => onPlay(track)}>
-              <span className={styles.trackNum}>{i + 1}</span>
-              {image && <img src={image} alt="" className={styles.trackImg} />}
-              <div className={styles.trackInfo}>
-                <span className={styles.trackName}>{track.name}</span>
-                <span className={styles.trackArtist}>{artist}</span>
-              </div>
-              <span className={styles.trackDuration}>{mins}:{secs}</span>
-              {track.preview_url && <span className={styles.trackPlayIcon}>▶</span>}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const months =
+    (now.getFullYear() - START_DATE.getFullYear()) * 12 +
+    (now.getMonth() - START_DATE.getMonth());
+  const days = Math.floor((now - START_DATE) / (1000 * 60 * 60 * 24));
+  return { months, days };
 }
 
 export default function Home() {
   const [user, setUser] = useState(null);
-  const [playlists, setPlaylists] = useState([]);
-  const [ourSong, setOurSong] = useState(null);
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { play } = usePlayer();
+  const [showSecret, setShowSecret] = useState(false);
+  const { months, days } = getMonthsAndDays();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    async function load() {
-      let playlistItems = [];
-
-      try {
-        const [userData, playlistData] = await Promise.all([
-          getCurrentUser(),
-          getUserPlaylists(),
-        ]);
-        setUser(userData);
-        playlistItems = playlistData.items || [];
-        setPlaylists(playlistItems);
-
-        // Search for "our song"
-        const songResult = await searchArtistTrack('Mon Laferte', 'My One and Only Love');
-        const song = songResult?.tracks?.items?.[0];
-        setOurSong(song || null);
-      } catch (err) {
-        console.error('Error loading home:', err);
-      }
-
-      // Buscar tracks de recomendaciones probando playlists hasta encontrar una accesible
-      // (separado del try principal para que un 403 no bloquee el resto de la página)
-      try {
-        for (const pl of playlistItems.slice(0, 6)) {
-          try {
-            const result = await getPlaylistTracks(pl.id, 10);
-            const tracks = (result?.items || []).map((item) => item.track).filter(Boolean);
-            if (tracks.length > 0) {
-              setRecommendations(tracks);
-              break;
-            }
-          } catch {
-            // Esta playlist no es accesible, probar la siguiente
-          }
-        }
-      } catch {
-        // Sin recomendaciones disponibles
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
+    getCurrentUser()
+      .then((data) => setUser(data))
+      .catch(() => {});
   }, []);
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        <div className={styles.spinner} />
-        <p>Cargando tu música, amor...</p>
-      </div>
-    );
-  }
+  const displayName = user?.display_name || 'Anitam';
+  const avatarUrl = user?.images?.[0]?.url || null;
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
-    <div className={styles.container}>
-      <div className={styles.welcome}>
-        <h1>Hola, {user?.display_name?.split(' ')[0] || 'amor'} 💕</h1>
+    <div className={styles.home}>
+      {/* NAV */}
+      <nav className={styles.nav}>
+        <div className={styles.navLogo}>Anitam Spotify</div>
+        <div className={styles.navLinks}>
+          <span className={`${styles.navLink} ${styles.active}`} onClick={() => navigate('/home')}>Inicio</span>
+          <span className={styles.navLink} onClick={() => navigate('/search')}>Buscar</span>
+          <span className={styles.navLink} onClick={() => navigate('/playlists')}>Playlists</span>
+        </div>
+        <div className={styles.navProfile}>
+          {avatarUrl
+            ? <img src={avatarUrl} alt={displayName} className={styles.avatarImg} />
+            : <div className={styles.avatar}>{initials}</div>
+          }
+          <span className={styles.navName}>{displayName}</span>
+        </div>
+      </nav>
+
+      {/* HERO */}
+      <div className={styles.hero}>
+        <div className={styles.heroBg} />
+        <div className={styles.heroBg2} />
+        <p className={styles.greeting}>Bienvenida de vuelta</p>
+        <h1 className={styles.heroTitle}>
+          Hola, <em>Anitam</em> ♡
+        </h1>
+
+        <div className={styles.counterCard} onClick={() => setShowSecret(true)}>
+          <div className={styles.counterHeart}>♡</div>
+          <div className={styles.counterInfo}>
+            <div className={styles.counterNum}>{months}</div>
+            <div className={styles.counterLabel}>meses juntos ♡</div>
+            <div className={styles.counterDetail}>{days} días y contando</div>
+          </div>
+        </div>
       </div>
 
-      <OurSong track={ourSong} onPlay={play} />
+      {/* NUESTRA CANCIÓN */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTitle}>Nuestra canción ♡</span>
+          <span className={styles.sectionSub}>siempre en repeat</span>
+        </div>
+        <div className={styles.ourSong}>
+          <div className={styles.ourSongGlow} />
+          <div className={styles.ourSongVinyl}>
+            <div className={styles.ourSongVinylCenter} />
+          </div>
+          <div className={styles.ourSongInfo}>
+            <div className={styles.ourSongBadge}>♡ LA nuestra</div>
+            <div className={styles.ourSongName}>My One and Only Love</div>
+            <div className={styles.ourSongArtist}>Mon Laferte</div>
+          </div>
+          <div className={styles.ourSongBars}>
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className={styles.sbar} />
+            ))}
+          </div>
+        </div>
+      </div>
 
-      <RomanticCounter startDate="2024-11-24" />
+      {/* NUESTRAS CANCIONES */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTitle}>Nuestras canciones</span>
+          <span className={styles.sectionSub}>solo las nuestras</span>
+        </div>
+        <div className={styles.songsGrid}>
+          <div className={styles.songCard}>
+            <div className={`${styles.songCardCover} ${styles.sc1}`}>♪</div>
+            <div className={styles.songCardName}>My One and Only Love</div>
+            <div className={styles.songCardArtist}>Mon Laferte</div>
+            <div className={styles.songCardPill}>nuestra ♡</div>
+          </div>
+          <div className={styles.songCard}>
+            <div className={`${styles.songCardCover} ${styles.sc2}`}>♪</div>
+            <div className={styles.songCardName}>Somos Dos</div>
+            <div className={styles.songCardArtist}>Bomba Estéreo</div>
+            <div className={styles.songCardPill}>nos recuerda</div>
+          </div>
+          <div className={styles.songCard}>
+            <div className={`${styles.songCardCover} ${styles.sc3}`}>♪</div>
+            <div className={styles.songCardName}>Fly Love</div>
+            <div className={styles.songCardArtist}>Jamie Foxx</div>
+            <div className={styles.songCardPill}>la pienso en ti</div>
+          </div>
+        </div>
+      </div>
 
-      <PlaylistGrid playlists={playlists} />
+      {/* ARTISTA FAVORITO */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTitle}>Tu artista favorito</span>
+          <span className={styles.sectionSub}>porque sé que te encanta</span>
+        </div>
+        <div className={styles.artistCard}>
+          <div className={styles.artistShimmer} />
+          <div className={styles.artistAvatar}>KR</div>
+          <div className={styles.artistInfo}>
+            <div className={styles.artistBadge}>♡ tu favorito</div>
+            <div className={styles.artistName}>Kris.R</div>
+            <div className={styles.artistSub}>R&amp;B · Soul · Alternativo</div>
+            <div className={styles.artistNote}>"porque sé que te encanta" — tu novio</div>
+            <div className={styles.artistDots}>
+              <div className={`${styles.dot} ${styles.active}`} />
+              <div className={styles.dot} />
+              <div className={styles.dot} />
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <RecommendedTracks tracks={recommendations} onPlay={play} />
+      {/* CANCIÓN DEL MES */}
+      <div className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <span className={styles.sectionTitle}>Lo que escuchas este mes</span>
+          <span className={styles.sectionSub}>en repeat ahora mismo</span>
+        </div>
+        <div className={styles.monthCard}>
+          <div className={styles.monthCover}>🌙</div>
+          <div className={styles.monthInfo}>
+            <div className={styles.monthBadge}>🔥 del mes</div>
+            <div className={styles.monthName}>Circus Maximus</div>
+            <div className={styles.monthArtist}>Travis Scott</div>
+          </div>
+          <div className={styles.monthWave}>
+            {[8, 18, 12, 18].map((h, i) => (
+              <div
+                key={i}
+                className={styles.mbar}
+                style={{ height: h, animationDelay: `${i * 0.08}s` }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <p className={styles.footerText}>
+        Desarrollado con amor por el novio más guapo del mundo 🎀
+      </p>
+
+      {/* MODAL SECRETO */}
+      {showSecret && (
+        <div className={styles.secretOverlay} onClick={() => setShowSecret(false)}>
+          <div className={styles.secretModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.secretEmoji}>♡</div>
+            <div className={styles.secretTitle}>Llevamos {months} meses</div>
+            <div className={styles.secretMsg}>
+              Cada día contigo es mi canción favorita. Gracias por hacer que todo
+              suene mejor, Anitam. Te amo un montón. 🎀
+            </div>
+            <button className={styles.secretClose} onClick={() => setShowSecret(false)}>
+              Cerrar ♡
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

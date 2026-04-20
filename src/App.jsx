@@ -17,7 +17,6 @@ function AppLayout({ children }) {
       <Navbar />
       <main style={{ flex: 1 }}>{children}</main>
       <Footer />
-      <Player />
     </>
   );
 }
@@ -33,7 +32,7 @@ export default function App() {
             path="/home"
             element={
               <ProtectedRoute>
-                <AppLayout><Home /></AppLayout>
+                <Home />
               </ProtectedRoute>
             }
           />
@@ -62,6 +61,7 @@ export default function App() {
             }
           />
         </Routes>
+        <Player />
       </PlayerProvider>
     </BrowserRouter>
   );
