@@ -1,68 +1,126 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { redirectToSpotifyAuth, isAuthenticated } from '../utils/spotify';
 import styles from './Welcome.module.css';
 
-function Hearts() {
-  const hearts = Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration: 6 + Math.random() * 8,
-    size: 10 + Math.random() * 20,
-    opacity: 0.15 + Math.random() * 0.3,
-  }));
-
-  return (
-    <div className={styles.heartsContainer}>
-      {hearts.map((h) => (
-        <span
-          key={h.id}
-          className={styles.heart}
-          style={{
-            left: `${h.left}%`,
-            animationDelay: `${h.delay}s`,
-            animationDuration: `${h.duration}s`,
-            fontSize: `${h.size}px`,
-            opacity: h.opacity,
-          }}
-        >
-          ♡
-        </span>
-      ))}
-    </div>
-  );
-}
-
 export default function Welcome() {
+  const particlesRef = useRef(null);
+  const waveformRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated()) navigate('/home', { replace: true });
   }, [navigate]);
 
+  useEffect(() => {
+    // Particles & hearts
+    const container = particlesRef.current;
+    if (!container) return;
+
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = styles.particle;
+      const size = Math.random() * 6 + 3;
+      p.style.cssText = `
+        width: ${size}px; height: ${size}px;
+        left: ${Math.random() * 100}%;
+        bottom: ${Math.random() * 20}%;
+        animation-duration: ${Math.random() * 6 + 5}s;
+        animation-delay: ${Math.random() * 6}s;
+      `;
+      container.appendChild(p);
+    }
+
+    for (let i = 0; i < 10; i++) {
+      const h = document.createElement('div');
+      h.className = styles.heartFloat;
+      h.textContent = '♡';
+      h.style.cssText = `
+        left: ${Math.random() * 90 + 5}%;
+        bottom: ${Math.random() * 15}%;
+        animation-duration: ${Math.random() * 5 + 6}s;
+        animation-delay: ${Math.random() * 8}s;
+        font-size: ${Math.random() * 8 + 10}px;
+      `;
+      container.appendChild(h);
+    }
+
+    // Waveform bars
+    const wv = waveformRef.current;
+    if (!wv) return;
+    const heights = [4,7,12,18,24,18,28,18,24,18,12,7,4,7,12,18,24,18,28,18,24,18,12,7,4];
+    heights.forEach((height, i) => {
+      const bar = document.createElement('div');
+      bar.className = styles.wvBar;
+      bar.style.cssText = `height: ${height}px; animation-delay: ${i * 0.06}s;`;
+      wv.appendChild(bar);
+    });
+
+    return () => {
+      container.innerHTML = '';
+      if (wv) wv.innerHTML = '';
+    };
+  }, []);
+
   return (
-    <div className={styles.container}>
-      <Hearts />
+    <div className={styles.root}>
+      {/* Background circles */}
+      <div className={`${styles.bgCircle} ${styles.bgCircle1}`} />
+      <div className={`${styles.bgCircle} ${styles.bgCircle2}`} />
+      <div className={`${styles.bgCircle} ${styles.bgCircle3}`} />
+
+      {/* Floating particles & hearts */}
+      <div className={styles.particlesContainer} ref={particlesRef} />
+
       <div className={styles.content}>
-        <div className={styles.logoWrapper}>
-          <span className={styles.musicNote}>♪</span>
-          <h1 className={styles.title}>Anitam Spotify</h1>
-          <span className={styles.musicNote}>♪</span>
+        {/* Badge */}
+        <div className={styles.logoBadge}>
+          <div className={styles.logoDot} />
+          <span>Tu espacio musical</span>
         </div>
-        <p className={styles.subtitle}>
-          Una versión especial de Spotify, hecha con todo mi amor para la persona más bonita del mundo 💕
-        </p>
+
+        {/* Title */}
+        <h1 className={styles.mainTitle}>
+          Anitam<br />
+          <em>Spotify</em>
+        </h1>
+        <p className={styles.subtitle}>Hecho con amor, solo para ti ♡</p>
+
+        {/* Vinyl */}
+        <div className={styles.vinylWrapper}>
+          <div className={styles.vinyl} />
+          <div className={styles.vinylCenter} />
+          <div className={styles.vinylNeedle} />
+        </div>
+
+        {/* Our song tag */}
+        <div className={styles.songTag}>
+          <div className={styles.songTagCover}>♪</div>
+          <div className={styles.songTagText}>
+            <span className={styles.songTagName}>My One and Only Love</span>
+            <span className={styles.songTagArtist}>Mon Laferte • Nuestra canción ♡</span>
+          </div>
+          <div className={styles.songBars}>
+            <div className={styles.bar} />
+            <div className={styles.bar} />
+            <div className={styles.bar} />
+            <div className={styles.bar} />
+          </div>
+        </div>
+
+        {/* Waveform */}
+        <div className={styles.waveform} ref={waveformRef} />
+
+        {/* Enter button */}
         <button className={styles.enterBtn} onClick={redirectToSpotifyAuth}>
-          <span>Entrar</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
+          Entrar a mi Spotify
+          <span className={styles.btnArrow}>→</span>
         </button>
       </div>
-      <footer className={styles.footer}>
+
+      <p className={styles.footerText}>
         Desarrollado con amor por el novio más guapo del mundo 🎀
-      </footer>
+      </p>
     </div>
   );
 }
