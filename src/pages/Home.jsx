@@ -4,13 +4,14 @@ import { getCurrentUser, searchArtistTrack } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
-const START_DATE = new Date('2024-11-24');
+const START_DATE = new Date('2025-11-24');
 
 function getMonthsAndDays() {
   const now = new Date();
-  const months =
+  let months =
     (now.getFullYear() - START_DATE.getFullYear()) * 12 +
     (now.getMonth() - START_DATE.getMonth());
+  if (now.getDate() < START_DATE.getDate()) months--;
   const days = Math.floor((now - START_DATE) / (1000 * 60 * 60 * 24));
   return { months, days };
 }
@@ -82,7 +83,7 @@ export default function Home() {
         <div className={styles.heroBg2} />
         <p className={styles.greeting}>Bienvenida de vuelta</p>
         <h1 className={styles.heroTitle}>
-          Hola, <em>Anitam</em> ♡
+          Hola, <em>{displayName.split(' ')[0]}</em> ♡
         </h1>
 
         <div className={styles.counterCard} onClick={() => setShowSecret(true)}>
