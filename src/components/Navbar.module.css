@@ -1,10 +1,11 @@
 .navbar {
   position: sticky;
   top: 0;
-  background: rgba(252, 248, 248, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--accent-soft);
+  background: rgba(252, 248, 248, 0.78);
+  backdrop-filter: blur(24px) saturate(1.8);
+  -webkit-backdrop-filter: blur(24px) saturate(1.8);
+  border-bottom: 1px solid rgba(245, 175, 175, 0.22);
+  box-shadow: 0 1px 30px rgba(197, 122, 122, 0.09);
   z-index: 50;
 }
 
@@ -61,8 +62,9 @@
 }
 
 .link.active {
-  background: var(--accent-main);
+  background: linear-gradient(135deg, var(--accent-main), var(--accent-dark));
   color: var(--white);
+  box-shadow: 0 3px 12px rgba(245, 175, 175, 0.4);
 }
 
 .profile {
@@ -86,6 +88,12 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent-main);
+  box-shadow: 0 0 0 3px rgba(245, 175, 175, 0.2);
+  transition: box-shadow 0.25s ease;
+}
+
+.profile:hover .avatar {
+  box-shadow: 0 0 0 4px rgba(245, 175, 175, 0.4);
 }
 
 .avatarPlaceholder {

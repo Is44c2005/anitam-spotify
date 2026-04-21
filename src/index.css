@@ -10,10 +10,12 @@
   --text-secondary: #7a5555;
   --white: #ffffff;
   --shadow: 0 2px 20px rgba(197, 122, 122, 0.15);
-  --shadow-lg: 0 8px 40px rgba(197, 122, 122, 0.2);
+  --shadow-lg: 0 8px 40px rgba(197, 122, 122, 0.22);
+  --shadow-xl: 0 16px 60px rgba(197, 122, 122, 0.3);
   --radius: 16px;
   --radius-sm: 10px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 * {
@@ -94,5 +96,26 @@ img {
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50%       { transform: translateY(-10px); }
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #F9DFDF 25%, #FBEAEA 50%, #F9DFDF 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

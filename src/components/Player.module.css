@@ -3,10 +3,12 @@
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--white);
-  box-shadow: 0 -4px 30px rgba(197, 122, 122, 0.15);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(1.6);
+  -webkit-backdrop-filter: blur(24px) saturate(1.6);
+  box-shadow: 0 -2px 40px rgba(197, 122, 122, 0.18);
   z-index: 100;
-  border-top: 1px solid var(--accent-soft);
+  border-top: 1px solid rgba(245, 175, 175, 0.2);
 }
 
 .progressBar {
@@ -14,17 +16,23 @@
   background: var(--accent-soft);
   cursor: pointer;
   position: relative;
+  transition: height 0.15s ease;
 }
 
 .progressBar:hover {
-  height: 6px;
+  height: 7px;
 }
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-main), var(--accent-dark));
-  border-radius: 0 2px 2px 0;
+  background: linear-gradient(90deg, #F9A8D4, var(--accent-main), var(--accent-dark));
+  border-radius: 0 3px 3px 0;
   transition: width 0.1s linear;
+  box-shadow: 0 0 8px rgba(245, 175, 175, 0.6);
+}
+
+.progressBar:hover .progressFill {
+  box-shadow: 0 0 14px rgba(245, 175, 175, 0.9);
 }
 
 .content {
@@ -46,11 +54,13 @@
 }
 
 .trackImg {
-  width: 44px;
-  height: 44px;
-  border-radius: 6px;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
+  box-shadow: 0 2px 12px rgba(197, 122, 122, 0.25);
+  border: 1.5px solid rgba(245, 175, 175, 0.3);
 }
 
 .trackText {
@@ -84,21 +94,25 @@
 }
 
 .controlBtn {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent-main), var(--accent-dark));
   color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: var(--transition);
-  box-shadow: 0 2px 10px rgba(245, 175, 175, 0.4);
+  transition: var(--spring);
+  box-shadow: 0 3px 14px rgba(245, 175, 175, 0.45);
 }
 
 .controlBtn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 4px 20px rgba(245, 175, 175, 0.6);
+  transform: scale(1.12);
+  box-shadow: 0 6px 24px rgba(245, 175, 175, 0.65);
+}
+
+.controlBtn:active {
+  transform: scale(0.95);
 }
 
 .controlBtnSmall {

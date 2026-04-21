@@ -4,8 +4,14 @@
   background: #FCF8F8;
   min-height: 100vh;
   font-family: 'DM Sans', sans-serif;
-  padding-bottom: 80px;
+  padding-bottom: 100px;
   position: relative;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* — NAV — */
@@ -82,21 +88,28 @@
 .heroBg {
   position: absolute;
   top: -60px; right: -80px;
-  width: 280px; height: 280px;
+  width: 320px; height: 320px;
   border-radius: 50%;
-  background: #F5AFAF;
-  opacity: 0.12;
+  background: radial-gradient(circle, #F5AFAF, #F9DFDF);
+  opacity: 0.18;
   pointer-events: none;
+  animation: drift 9s ease-in-out infinite;
 }
 
 .heroBg2 {
   position: absolute;
   bottom: -40px; left: -60px;
-  width: 200px; height: 200px;
+  width: 220px; height: 220px;
   border-radius: 50%;
-  background: #F9DFDF;
-  opacity: 0.2;
+  background: radial-gradient(circle, #F9DFDF, #FBEFEF);
+  opacity: 0.25;
   pointer-events: none;
+  animation: drift 7s ease-in-out infinite reverse;
+}
+
+@keyframes drift {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-14px) scale(1.04); }
 }
 
 .greeting {
@@ -128,16 +141,17 @@
   gap: 14px;
   background: white;
   border: 1px solid #F9DFDF;
-  border-radius: 16px;
-  padding: 14px 20px;
-  box-shadow: 0 2px 16px rgba(245, 175, 175, 0.12);
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow: 0 4px 24px rgba(245, 175, 175, 0.15);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: var(--spring);
 }
 
 .counterCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(245, 175, 175, 0.22);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 36px rgba(245, 175, 175, 0.28);
+  border-color: #F5AFAF;
 }
 
 .counterHeart {
@@ -179,8 +193,19 @@
 
 /* — SECTIONS — */
 .section {
-  padding: 28px 24px 0;
+  padding: 32px 24px 0;
+  animation: slideUp 0.5s ease both;
 }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section:nth-child(2) { animation-delay: 0.05s; }
+.section:nth-child(3) { animation-delay: 0.10s; }
+.section:nth-child(4) { animation-delay: 0.15s; }
+.section:nth-child(5) { animation-delay: 0.20s; }
 
 .sectionHeader {
   display: flex;
@@ -191,26 +216,36 @@
 
 .sectionTitle {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   color: #3a2020;
+  letter-spacing: -0.01em;
 }
 
 .sectionSub {
   font-size: 11px;
-  color: #b08080;
+  color: #c9a0a0;
+  font-style: italic;
 }
 
 /* — OUR SONG — */
 .ourSong {
-  background: linear-gradient(135deg, #FFF0F0, #FBEFEF);
+  background: linear-gradient(135deg, #FFF3F3, #FBEFEF);
   border: 1px solid #F5AFAF;
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 22px;
+  padding: 22px;
   display: flex;
   align-items: center;
   gap: 16px;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  transition: var(--spring);
+  box-shadow: 0 4px 20px rgba(245, 175, 175, 0.15);
+}
+
+.ourSong:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 36px rgba(245, 175, 175, 0.28);
 }
 
 .ourSongGlow {
@@ -223,7 +258,7 @@
 }
 
 .ourSongVinyl {
-  width: 70px; height: 70px;
+  width: 72px; height: 72px;
   border-radius: 50%;
   background: conic-gradient(
     #3a2020 0deg 30deg,   #5a3030 30deg 60deg,
@@ -235,7 +270,7 @@
   );
   flex-shrink: 0;
   animation: spin 5s linear infinite;
-  box-shadow: 0 4px 16px rgba(196, 122, 122, 0.3);
+  box-shadow: 0 4px 20px rgba(196, 122, 122, 0.35), 0 0 0 3px rgba(245, 175, 175, 0.2);
   position: relative;
 }
 
@@ -319,20 +354,22 @@
 .songCard {
   background: white;
   border: 1px solid #F9DFDF;
-  border-radius: 16px;
-  padding: 14px 12px;
+  border-radius: 18px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 8px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: var(--spring);
+  box-shadow: 0 2px 10px rgba(245, 175, 175, 0.08);
 }
 
 .songCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(245, 175, 175, 0.18);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(245, 175, 175, 0.24);
+  border-color: #F5AFAF;
 }
 
 .songCardCover {
@@ -355,7 +392,9 @@
 }
 
 .songCardActive {
-  box-shadow: 0 0 0 2px #F5AFAF, 0 6px 20px rgba(245, 175, 175, 0.25);
+  box-shadow: 0 0 0 2.5px #F5AFAF, 0 10px 28px rgba(245, 175, 175, 0.3);
+  border-color: #F5AFAF;
+  background: #FFF8F8;
 }
 
 .songCardName {
@@ -381,18 +420,26 @@
 /* — ARTIST — */
 .artistCard {
   background: linear-gradient(135deg, #3a2020, #5a3030);
-  border-radius: 20px;
-  padding: 20px;
+  border-radius: 22px;
+  padding: 22px;
   display: flex;
   align-items: center;
   gap: 16px;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  transition: var(--spring);
+  box-shadow: 0 6px 28px rgba(58, 32, 32, 0.28);
+}
+
+.artistCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 42px rgba(58, 32, 32, 0.38);
 }
 
 .artistShimmer {
   position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(135deg, rgba(245,175,175,0.08), transparent);
+  background: linear-gradient(120deg, rgba(245,175,175,0.10) 0%, transparent 60%);
   pointer-events: none;
 }
 
@@ -461,11 +508,20 @@
 .monthCard {
   background: white;
   border: 1px solid #F9DFDF;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 18px;
+  padding: 18px;
   display: flex;
   align-items: center;
   gap: 14px;
+  cursor: pointer;
+  transition: var(--spring);
+  box-shadow: 0 2px 10px rgba(245, 175, 175, 0.08);
+}
+
+.monthCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(245, 175, 175, 0.2);
+  border-color: #F5AFAF;
 }
 
 .monthCover {
@@ -485,7 +541,9 @@
 }
 
 .monthCardActive {
-  box-shadow: 0 0 0 2px #F5AFAF, 0 4px 16px rgba(245, 175, 175, 0.2);
+  box-shadow: 0 0 0 2.5px #F5AFAF, 0 10px 28px rgba(245, 175, 175, 0.28);
+  border-color: #F5AFAF;
+  background: #FFF8F8;
 }
 
 .monthInfo { flex: 1; }
@@ -546,12 +604,14 @@
 
 .secretModal {
   background: white;
-  border-radius: 24px;
-  padding: 32px 28px;
+  border-radius: 28px;
+  padding: 36px 32px;
   text-align: center;
-  max-width: 300px;
+  max-width: 320px;
   margin: 0 16px;
-  animation: popIn 0.3s ease;
+  box-shadow: 0 24px 80px rgba(58, 32, 32, 0.2);
+  border: 1px solid #F9DFDF;
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes popIn {
