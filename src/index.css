@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 :root {
   --bg-primary: #FCF8F8;
@@ -12,10 +12,16 @@
   --shadow: 0 2px 20px rgba(197, 122, 122, 0.15);
   --shadow-lg: 0 8px 40px rgba(197, 122, 122, 0.22);
   --shadow-xl: 0 16px 60px rgba(197, 122, 122, 0.3);
-  --radius: 16px;
-  --radius-sm: 10px;
+  --radius: 6px;
+  --radius-sm: 4px;
   --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   --spring: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --hand-font: 'Caveat', cursive;
+  --mono-font: 'JetBrains Mono', monospace;
+  --display-font: 'Playfair Display', serif;
+  --body-font: 'DM Sans', sans-serif;
+  --ink: #3a2020;
+  --cream: #FFFCF7;
 }
 
 * {
@@ -30,9 +36,14 @@ html {
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  font-family: var(--body-font);
+  background-color: #FFFCF7;
+  background-image:
+    radial-gradient(circle at 18% 28%, rgba(249,223,223,.6) 0, transparent 22%),
+    radial-gradient(circle at 82% 72%, rgba(245,175,175,.15) 0, transparent 22%),
+    repeating-linear-gradient(90deg, transparent 0 24px, rgba(196,122,122,.035) 24px 25px),
+    repeating-linear-gradient(0deg, transparent 0 24px, rgba(196,122,122,.035) 24px 25px);
+  color: var(--ink);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
@@ -109,7 +120,18 @@ img {
   background: linear-gradient(90deg, #F9DFDF 25%, #FBEAEA 50%, #F9DFDF 75%);
   background-size: 800px 100%;
   animation: shimmer 1.4s ease-in-out infinite;
-  border-radius: 8px;
+  border-radius: 4px;
+}
+
+/* ── Scrapbook word-by-word modal animation ── */
+@keyframes wordIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Reduced motion ── */

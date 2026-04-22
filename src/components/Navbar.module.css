@@ -1,11 +1,11 @@
 .navbar {
   position: sticky;
   top: 0;
-  background: rgba(252, 248, 248, 0.78);
-  backdrop-filter: blur(24px) saturate(1.8);
-  -webkit-backdrop-filter: blur(24px) saturate(1.8);
-  border-bottom: 1px solid rgba(245, 175, 175, 0.22);
-  box-shadow: 0 1px 30px rgba(197, 122, 122, 0.09);
+  background: rgba(255, 253, 250, 0.92);
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1.5px dashed rgba(196, 122, 122, 0.3);
+  box-shadow: 0 1px 20px rgba(58, 32, 32, 0.06);
   z-index: 50;
 }
 
@@ -15,30 +15,47 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.5rem;
+  padding: 18px 40px;
   gap: 1rem;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.25rem;
+  gap: 10px;
+  font-family: var(--display-font);
+  font-size: 22px;
+  font-style: italic;
   font-weight: 700;
-  color: var(--accent-dark);
+  color: var(--ink);
   white-space: nowrap;
 }
 
-.logoIcon {
-  font-size: 1.4rem;
-  color: var(--accent-main);
-  animation: bounce 2s ease-in-out infinite;
+.logoVinyl {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--ink), var(--accent-dark), var(--ink));
+  position: relative;
+  animation: vinylSpin 8s linear infinite;
+  flex-shrink: 0;
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+.logoVinyl::after {
+  content: '';
+  position: absolute;
+  inset: 36%;
+  border-radius: 50%;
+  background: var(--accent-main);
+}
+
+@keyframes vinylSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.logoAccent {
+  color: var(--accent-dark);
 }
 
 .links {
@@ -49,22 +66,33 @@
 
 .link {
   padding: 0.5rem 1rem;
-  border-radius: 50px;
+  border-radius: 8px;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-secondary);
   transition: var(--transition);
+  cursor: pointer;
+  position: relative;
 }
 
 .link:hover {
-  background: var(--accent-soft);
-  color: var(--text-primary);
+  color: var(--accent-dark);
 }
 
+/* Scrapbook active: rotated box around the link */
 .link.active {
-  background: linear-gradient(135deg, var(--accent-main), var(--accent-dark));
-  color: var(--white);
-  box-shadow: 0 3px 12px rgba(245, 175, 175, 0.4);
+  color: var(--accent-dark);
+  font-weight: 600;
+}
+
+.link.active::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 1.5px solid var(--accent-dark);
+  border-radius: 8px;
+  transform: rotate(-1.5deg);
+  pointer-events: none;
 }
 
 .profile {
@@ -74,7 +102,7 @@
   cursor: pointer;
   position: relative;
   padding: 0.35rem 0.75rem;
-  border-radius: 50px;
+  border-radius: 8px;
   transition: var(--transition);
 }
 
@@ -89,11 +117,6 @@
   object-fit: cover;
   border: 2px solid var(--accent-main);
   box-shadow: 0 0 0 3px rgba(245, 175, 175, 0.2);
-  transition: box-shadow 0.25s ease;
-}
-
-.profile:hover .avatar {
-  box-shadow: 0 0 0 4px rgba(245, 175, 175, 0.4);
 }
 
 .avatarPlaceholder {
@@ -101,10 +124,12 @@
   height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent-main), var(--accent-dark));
-  color: var(--white);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--display-font);
+  font-style: italic;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -112,7 +137,7 @@
 .userName {
   font-size: 0.85rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .dropdown {
@@ -120,9 +145,10 @@
   top: 100%;
   right: 0;
   margin-top: 0.5rem;
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-lg);
+  background: var(--cream);
+  border-radius: 6px;
+  border: 1px solid rgba(196, 122, 122, 0.2);
+  box-shadow: 3px 4px 0 rgba(58, 32, 32, 0.07), var(--shadow-lg);
   padding: 0.5rem;
   min-width: 150px;
   animation: dropIn 0.2s ease;
@@ -130,18 +156,19 @@
 
 @keyframes dropIn {
   from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .dropdownItem {
   width: 100%;
   padding: 0.6rem 1rem;
   background: none;
-  color: var(--text-primary);
+  color: var(--ink);
   font-size: 0.85rem;
   text-align: left;
-  border-radius: 6px;
+  border-radius: 4px;
   transition: var(--transition);
+  cursor: pointer;
 }
 
 .dropdownItem:hover {
@@ -150,20 +177,9 @@
 }
 
 @media (max-width: 600px) {
-  .links {
-    gap: 0;
-  }
-
-  .link {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
-  }
-
-  .userName {
-    display: none;
-  }
-
-  .logo {
-    font-size: 1.05rem;
-  }
+  .inner { padding: 14px 20px; }
+  .links { gap: 0; }
+  .link { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+  .userName { display: none; }
+  .logo { font-size: 1.1rem; }
 }

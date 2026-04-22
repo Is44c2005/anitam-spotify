@@ -220,6 +220,39 @@
   text-overflow: ellipsis;
 }
 
+.sectionLabel {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 2rem 0 0.75rem;
+}
+
+.sectionLabel:first-of-type {
+  margin-top: 0;
+}
+
+.spotifyOwned {
+  opacity: 0.55;
+  position: relative;
+}
+
+.spotifyOwned:hover {
+  transform: none;
+  box-shadow: var(--shadow);
+}
+
+.lockBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: var(--white);
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  z-index: 2;
+}
+
 @media (max-width: 600px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);

@@ -86,29 +86,71 @@ export default function Playlists() {
           <p className={styles.emptyHint}>¡Crea una ahora!</p>
         </div>
       ) : (
-        <div className={styles.grid}>
-          {playlists.map((pl) => (
-            <Link to={`/playlists/${pl.id}`} key={pl.id} className={styles.card}>
-              <div className={styles.cardImageWrapper}>
-                <img
-                  src={pl.images?.[0]?.url || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23F9DFDF" width="100" height="100"/><text x="50" y="55" text-anchor="middle" font-size="40">🎵</text></svg>'}
-                  alt={pl.name}
-                  className={styles.cardImage}
-                />
-                <div className={styles.cardOverlay}>
-                  <span className={styles.cardPlay}>▶</span>
-                </div>
-              </div>
-              <div className={styles.cardInfo}>
-                <h3 className={styles.cardTitle}>{pl.name}</h3>
-                <p className={styles.cardSub}>
-                  {pl.tracks?.total || 0} canciones
-                  {pl.owner?.display_name ? ` · ${pl.owner.display_name}` : ''}
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        (() => {
+          const mine = playlists.filter((pl) => pl.owner?.id !== 'spotify');
+          const spotifyOwned = playlists.filter((pl) => pl.owner?.id === 'spotify');
+          return (
+            <>
+              {mine.length > 0 && (
+                <>
+                  <h2 className={styles.sectionLabel}>Tuyas 💕</h2>
+                  <div className={styles.grid}>
+                    {mine.map((pl) => (
+                      <Link to={`/playlists/${pl.id}`} key={pl.id} className={styles.card}>
+                        <div className={styles.cardImageWrapper}>
+                          <img
+                            src={pl.images?.[0]?.url || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23F9DFDF" width="100" height="100"/><text x="50" y="55" text-anchor="middle" font-size="40">🎵</text></svg>'}
+                            alt={pl.name}
+                            className={styles.cardImage}
+                          />
+                          <div className={styles.cardOverlay}>
+                            <span className={styles.cardPlay}>▶</span>
+                          </div>
+                        </div>
+                        <div className={styles.cardInfo}>
+                          <h3 className={styles.cardTitle}>{pl.name}</h3>
+                          <p className={styles.cardSub}>
+                            {pl.tracks?.total || 0} canciones
+                            {pl.owner?.display_name ? ` · ${pl.owner.display_name}` : ''}
+                          </p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {spotifyOwned.length > 0 && (
+                <>
+                  <h2 className={styles.sectionLabel}>De Spotify 🔒</h2>
+                  <p className={styles.emptyHint} style={{ marginBottom: '0.75rem' }}>
+                    Estas playlists son creadas por Spotify y su contenido no se puede leer desde apps externas.
+                  </p>
+                  <div className={styles.grid}>
+                    {spotifyOwned.map((pl) => (
+                      <div key={pl.id} className={`${styles.card} ${styles.spotifyOwned}`}>
+                        <div className={styles.cardImageWrapper}>
+                          <span className={styles.lockBadge}>🔒 Spotify</span>
+                          <img
+                            src={pl.images?.[0]?.url || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23F9DFDF" width="100" height="100"/><text x="50" y="55" text-anchor="middle" font-size="40">🎵</text></svg>'}
+                            alt={pl.name}
+                            className={styles.cardImage}
+                          />
+                        </div>
+                        <div className={styles.cardInfo}>
+                          <h3 className={styles.cardTitle}>{pl.name}</h3>
+                          <p className={styles.cardSub}>
+                            {pl.tracks?.total || 0} canciones · Spotify
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          );
+        })()
       )}
     </div>
   );
