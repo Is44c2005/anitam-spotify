@@ -34,7 +34,7 @@ export default function Search() {
     setSearched(true);
     setError(null);
     try {
-      const data = await searchTracks(q, 20);
+      const data = await searchTracks(q, 10);
       const items = data?.tracks?.items || [];
       setResults(items);
       if (items.length === 0 && data) setError(null);

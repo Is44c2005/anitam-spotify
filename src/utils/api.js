@@ -62,11 +62,9 @@ export async function getPlaylist(id) {
 }
 
 export async function getPlaylistTracks(id, limit = 100, offset = 0) {
-  const params = new URLSearchParams({
-    limit: String(Math.min(100, Math.max(1, Number(limit) || 100))),
-    offset: String(Math.max(0, Number(offset) || 0)),
-  });
-  return fetchSpotify(`/playlists/${id}/tracks?${params.toString()}`);
+  return fetchSpotify(
+    `/playlists/${id}/tracks?limit=${parseInt(limit, 10)}&offset=${parseInt(offset, 10)}`
+  );
 }
 
 export async function getAllPlaylistTracks(id) {
@@ -90,27 +88,20 @@ export async function getAllPlaylistTracks(id) {
   return allItems;
 }
 
-export async function searchTracks(query, limit = 20) {
-  const safeLimit = Math.min(50, Math.max(1, Math.floor(Number(limit)) || 20));
-  const params = new URLSearchParams({
-    q: query,
-    type: 'track',
-    limit: String(safeLimit),
-  });
-  return fetchSpotify(`/search?${params.toString()}`);
+export async function searchTracks(query, limit = 10) {
+  return fetchSpotify(
+    `/search?q=${encodeURIComponent(query)}&type=track&limit=${parseInt(limit, 10)}`
+  );
 }
 
 export async function searchArtistTrack(artist, track) {
-  const params = new URLSearchParams({
-    q: `artist:${artist} track:${track}`,
-    type: 'track',
-    limit: '1',
-  });
-  return fetchSpotify(`/search?${params.toString()}`);
+  return fetchSpotify(
+    `/search?q=${encodeURIComponent(`artist:${artist} track:${track}`)}&type=track&limit=1`
+  );
 }
 
 export async function getUserTopTracks(limit = 10) {
-  return fetchSpotify(`/me/top/tracks?limit=${limit}&time_range=short_term`);
+  return fetchSpotify(`/me/top/tracks?limit=${parseInt(limit, 10)}&time_range=short_term`);
 }
 
 export async function createPlaylist(userId, name, description = '') {
