@@ -10,125 +10,6 @@
   padding: 0 32px;
 }
 
-/* ── Nav ── */
-.nav {
-  background: rgba(255, 253, 250, 0.9);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
-  border-bottom: 1.5px dashed rgba(196, 122, 122, 0.28);
-  padding: 18px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.navLogo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: var(--display-font);
-  font-size: 22px;
-  font-style: italic;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.navVinyl {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--ink), var(--accent-dark), var(--ink));
-  position: relative;
-  animation: vinylSpin 8s linear infinite;
-  flex-shrink: 0;
-}
-
-.navVinyl::after {
-  content: '';
-  position: absolute;
-  inset: 36%;
-  border-radius: 50%;
-  background: var(--accent-main);
-}
-
-@keyframes vinylSpin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.navLogoAccent { color: var(--accent-dark); }
-
-.navLinks {
-  display: flex;
-  gap: 8px;
-}
-
-.navLink {
-  font-size: 13px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: color 0.2s;
-  position: relative;
-}
-
-.navLink:hover { color: var(--accent-dark); }
-
-.navLink.active {
-  color: var(--accent-dark);
-  font-weight: 600;
-}
-
-.navLink.active::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border: 1.5px solid var(--accent-dark);
-  border-radius: 6px;
-  transform: rotate(-1.5deg);
-  pointer-events: none;
-}
-
-.navProfile {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-main), var(--accent-dark));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--display-font);
-  font-style: italic;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
-}
-
-.avatarImg {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--accent-main);
-}
-
-.navName {
-  font-size: 13px;
-  color: var(--ink);
-  font-weight: 500;
-}
-
 /* ── Hero ── */
 .hero {
   padding: 60px 0 20px;
@@ -358,24 +239,26 @@
 
 .timelineTrack {
   position: relative;
-  height: 60px;
+  height: 80px;
 }
 
 .timelineTrack::before {
   content: '';
   position: absolute;
-  top: 30px;
+  top: 50%;
   left: 0;
   right: 0;
   height: 2px;
+  transform: translateY(-50%);
   background: linear-gradient(90deg, var(--accent-soft), var(--accent-main) 60%, var(--accent-soft));
 }
 
 .timelineFill {
   position: absolute;
-  top: 29px;
+  top: 50%;
   left: 0;
   height: 4px;
+  transform: translateY(-50%);
   background: linear-gradient(90deg, var(--accent-main), var(--accent-dark));
   border-radius: 2px;
   transition: width 0.8s ease;
@@ -384,17 +267,23 @@
 .timelineDot {
   position: absolute;
   top: 0;
+  bottom: 0;
   transform: translateX(-50%);
-  text-align: center;
-  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .timelineLabel {
+  position: absolute;
+  bottom: calc(50% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--display-font);
   font-style: italic;
   font-size: 11px;
-  margin-bottom: 8px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .timelinePip {
@@ -402,9 +291,10 @@
   height: 10px;
   border-radius: 50%;
   background: var(--accent-soft);
-  margin: 0 auto;
   border: 2px solid #fff;
   transition: all 0.3s;
+  flex-shrink: 0;
+  z-index: 1;
 }
 
 .timelinePipReached {
@@ -415,12 +305,14 @@
 }
 
 .timelineText {
-  font-size: 11px;
-  margin-top: 8px;
-  line-height: 1.3;
-  font-style: italic;
+  position: absolute;
+  top: calc(50% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--hand-font);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
 }
 
 /* ── Songs grid ── */

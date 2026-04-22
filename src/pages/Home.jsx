@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, searchArtistTrack } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
@@ -35,7 +34,6 @@ export default function Home() {
   const [showSecret, setShowSecret] = useState(false);
   const [spotifyTracks, setSpotifyTracks] = useState({});
   const { months, days } = getMonthsAndDays();
-  const navigate = useNavigate();
   const { play, currentTrack, isPlaying } = usePlayer();
 
   useEffect(() => {
@@ -67,26 +65,6 @@ export default function Home() {
 
   return (
     <div className={styles.home}>
-      {/* NAV */}
-      <nav className={styles.nav}>
-        <div className={styles.navLogo}>
-          <div className={styles.navVinyl} />
-          <span>Anitam<span className={styles.navLogoAccent}>♡</span></span>
-        </div>
-        <div className={styles.navLinks}>
-          <span className={`${styles.navLink} ${styles.active}`} onClick={() => navigate('/home')}>Inicio</span>
-          <span className={styles.navLink} onClick={() => navigate('/search')}>Buscar</span>
-          <span className={styles.navLink} onClick={() => navigate('/playlists')}>Playlists</span>
-        </div>
-        <div className={styles.navProfile}>
-          {avatarUrl
-            ? <img src={avatarUrl} alt={displayName} className={styles.avatarImg} />
-            : <div className={styles.avatar}>{initials}</div>
-          }
-          <span className={styles.navName}>{firstName}</span>
-        </div>
-      </nav>
-
       <div className={styles.container}>
         {/* HERO */}
         <div className={styles.hero}>

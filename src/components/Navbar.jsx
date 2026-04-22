@@ -26,8 +26,8 @@ export default function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.inner}>
         <NavLink to="/home" className={styles.logo}>
-          <span className={styles.logoIcon}>♪</span>
-          Anitam Spotify
+          <div className={styles.logoVinyl} />
+          Anitam<span className={styles.logoAccent}>♡</span>
         </NavLink>
 
         <div className={styles.links}>

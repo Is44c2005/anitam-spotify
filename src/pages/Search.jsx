@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { searchTracks, getCurrentUser } from '../utils/api';
+import { useState, useRef, useCallback } from 'react';
+import { searchTracks } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Search.module.css';
 
@@ -24,15 +23,9 @@ export default function Search() {
   const [results, setResults]   = useState([]);
   const [loading, setLoading]   = useState(false);
   const [searched, setSearched] = useState(false);
-  const [user, setUser]         = useState(null);
   const debounceRef             = useRef(null);
-  const navigate                = useNavigate();
 
   const { play, togglePlay, currentTrack, isPlaying } = usePlayer();
-
-  useEffect(() => {
-    getCurrentUser().then(setUser).catch(() => {});
-  }, []);
 
   const doSearch = useCallback(async (q) => {
     if (!q.trim()) { setResults([]); setSearched(false); return; }
@@ -66,33 +59,12 @@ export default function Search() {
     setSearched(false);
   };
 
-  const displayName = user?.display_name || '';
-  const avatarUrl   = user?.images?.[0]?.url || null;
-  const initials    = displayName.slice(0, 2).toUpperCase();
-
   const showMoods   = !searched && results.length === 0;
   const showEmpty   = searched && !loading && results.length === 0;
   const showResults = results.length > 0;
 
   return (
     <div className={styles.page}>
-      {/* NAV */}
-      <nav className={styles.nav}>
-        <div className={styles.navLogo}>Anitam Spotify</div>
-        <div className={styles.navLinks}>
-          <span className={styles.navLink} onClick={() => navigate('/home')}>Inicio</span>
-          <span className={`${styles.navLink} ${styles.active}`}>Buscar</span>
-          <span className={styles.navLink} onClick={() => navigate('/playlists')}>Playlists</span>
-        </div>
-        <div className={styles.navProfile}>
-          {avatarUrl
-            ? <img src={avatarUrl} alt={displayName} className={styles.avatarImg} />
-            : <div className={styles.avatar}>{initials}</div>
-          }
-          <span className={styles.navName}>{displayName}</span>
-        </div>
-      </nav>
-
       {/* SEARCH HERO */}
       <div className={styles.searchHero}>
         <div className={styles.heroBlob} />
