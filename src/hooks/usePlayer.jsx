@@ -261,12 +261,28 @@ export function PlayerProvider({ children }) {
     playerRef.current?.setVolume(clamped);
   }, []);
 
+  const resetPlayer = useCallback(() => {
+    stopTick();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+    if (playerRef.current) {
+      playerRef.current.disconnect();
+      playerRef.current = null;
+    }
+    setCurrentTrack(null);
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+  }, []);
+
   return (
     <PlayerContext.Provider
       value={{
         currentTrack, isPlaying, progress, duration, deviceId,
         volume, sdkReady, previewMode,
-        play, pause, resume, togglePlay, seek, previous, next, setVolume,
+        play, pause, resume, togglePlay, seek, previous, next, setVolume, resetPlayer,
       }}
     >
       {children}

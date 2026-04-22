@@ -130,6 +130,25 @@
   margin-top: 10px;
 }
 
+.polaroidSongName {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 8px;
+}
+
+.polaroidSongArtist {
+  font-family: var(--hand-font);
+  font-size: 13px;
+  color: var(--accent-dark);
+  text-align: center;
+  margin-top: 4px;
+}
+
 /* Ticket */
 .ticketTop {
   font-family: var(--mono-font);

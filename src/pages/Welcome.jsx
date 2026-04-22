@@ -28,9 +28,10 @@ export default function Welcome() {
           {/* Polaroid */}
           <div className={`${styles.card} ${styles.card1}`}>
             <div className={styles.polaroidImg}>
-              <span>[ nuestra primera<br />canción juntos ]</span>
+              <div className={styles.polaroidSongName}>My One and Only Love</div>
+              <div className={styles.polaroidSongArtist}>Mon Laferte</div>
             </div>
-            <div className={styles.polaroidCaption}>♡ el inicio</div>
+            <div className={styles.polaroidCaption}>♡ nuestra canción</div>
           </div>
 
           {/* Ticket */}

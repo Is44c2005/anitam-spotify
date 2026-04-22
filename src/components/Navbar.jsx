@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { getCurrentUser } from '../utils/api';
 import { logout } from '../utils/spotify';
+import { usePlayer } from '../hooks/usePlayer';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { resetPlayer } = usePlayer();
 
   useEffect(() => {
     getCurrentUser()
@@ -16,6 +18,7 @@ export default function Navbar() {
   }, []);
 
   function handleLogout() {
+    resetPlayer();
     logout();
     navigate('/');
   }

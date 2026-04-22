@@ -3,7 +3,7 @@ import { getCurrentUser, searchArtistTrack } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
-const START_DATE = new Date('2025-11-24');
+const START_DATE = new Date('2024-11-24');
 
 function getMonthsAndDays() {
   const now = new Date();
@@ -17,6 +17,7 @@ function getMonthsAndDays() {
 
 const SONG_DEFS = [
   { key: 'ourSong',       artist: 'Mon Laferte',  title: 'My One and Only Love' },
+  { key: 'sundayMorning', artist: 'Maroon 5',     title: 'Sunday Morning'       },
   { key: 'somosDos',      artist: 'Bomba Estereo', title: 'Somos Dos'            },
   { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love'             },
   { key: 'circusMaximus', artist: 'Travis Scott',  title: 'Circus Maximus'       },
@@ -144,14 +145,14 @@ export default function Home() {
           <div className={styles.sectionSub}>— solo las nuestras</div>
           <div className={styles.songsGrid}>
             {[
-              { key: 'ourSong',  label: 'nuestra ♡',      rot: -2   },
-              { key: 'somosDos', label: 'nos recuerda',    rot:  1.5 },
-              { key: 'flyLove',  label: 'la pienso en ti', rot: -1.5 },
-            ].map(({ key, label, rot }) => {
+              { key: 'sundayMorning', label: 'nuestra ♡',      rot: -2,   fallbackName: 'Sunday Morning',  fallbackArtist: 'Maroon 5'      },
+              { key: 'somosDos',      label: 'nos recuerda',    rot:  1.5, fallbackName: 'Somos Dos',       fallbackArtist: 'Bomba Estéreo' },
+              { key: 'flyLove',       label: 'la pienso en ti', rot: -1.5, fallbackName: 'Fly Love',        fallbackArtist: 'Jamie Foxx'    },
+            ].map(({ key, label, rot, fallbackName, fallbackArtist }) => {
               const track    = spotifyTracks[key];
               const coverUrl = track?.album?.images?.[0]?.url;
-              const name     = track?.name     || (key === 'ourSong' ? 'My One and Only Love' : key === 'somosDos' ? 'Somos Dos' : 'Fly Love');
-              const artist   = track?.artists?.[0]?.name || (key === 'ourSong' ? 'Mon Laferte' : key === 'somosDos' ? 'Bomba Estéreo' : 'Jamie Foxx');
+              const name     = track?.name              || fallbackName;
+              const artist   = track?.artists?.[0]?.name || fallbackArtist;
               const active   = isPlaying && currentTrack?.id === track?.id;
               return (
                 <div
