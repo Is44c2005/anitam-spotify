@@ -17,11 +17,12 @@ async function fetchSpotify(endpoint, options = {}, retry = true) {
     throw new SpotifyApiError('No token', 401);
   }
 
+  const hasBody = options.body !== undefined;
   const res = await fetch(`${BASE}${endpoint}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      ...(hasBody && { 'Content-Type': 'application/json' }),
       ...options.headers,
     },
   });
@@ -64,7 +65,6 @@ export async function getPlaylistTracks(id, limit = 100, offset = 0) {
   const params = new URLSearchParams({
     limit: String(Math.min(100, Math.max(1, Number(limit) || 100))),
     offset: String(Math.max(0, Number(offset) || 0)),
-    market: 'from_token',
   });
   return fetchSpotify(`/playlists/${id}/tracks?${params.toString()}`);
 }
@@ -105,7 +105,6 @@ export async function searchArtistTrack(artist, track) {
     q: `artist:${artist} track:${track}`,
     type: 'track',
     limit: '1',
-    market: 'from_token',
   });
   return fetchSpotify(`/search?${params.toString()}`);
 }
