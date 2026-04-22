@@ -181,7 +181,7 @@ export default function Search() {
       {error && !loading && (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>!</div>
-          <div className={styles.emptyTitle}>Sesión expirada</div>
+          <div className={styles.emptyTitle}>Error al buscar</div>
           <div className={styles.emptySub}>{error}</div>
         </div>
       )}

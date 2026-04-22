@@ -91,11 +91,11 @@ export async function getAllPlaylistTracks(id) {
 }
 
 export async function searchTracks(query, limit = 20) {
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(Number(limit)) || 20));
   const params = new URLSearchParams({
     q: query,
     type: 'track',
-    limit: String(Math.min(50, Math.max(1, Number(limit) || 20))),
-    market: 'from_token',
+    limit: String(safeLimit),
   });
   return fetchSpotify(`/search?${params.toString()}`);
 }
