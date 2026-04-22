@@ -23,19 +23,24 @@ export default function Search() {
   const [results, setResults]   = useState([]);
   const [loading, setLoading]   = useState(false);
   const [searched, setSearched] = useState(false);
+  const [error, setError]       = useState(null);
   const debounceRef             = useRef(null);
 
   const { play, togglePlay, currentTrack, isPlaying } = usePlayer();
 
   const doSearch = useCallback(async (q) => {
-    if (!q.trim()) { setResults([]); setSearched(false); return; }
+    if (!q.trim()) { setResults([]); setSearched(false); setError(null); return; }
     setLoading(true);
     setSearched(true);
+    setError(null);
     try {
       const data = await searchTracks(q, 20);
-      setResults(data?.tracks?.items || []);
-    } catch {
+      const items = data?.tracks?.items || [];
+      setResults(items);
+      if (items.length === 0 && data) setError(null);
+    } catch (err) {
       setResults([]);
+      setError(err?.message || 'Error al buscar. Intenta cerrar sesión y volver a entrar.');
     } finally {
       setLoading(false);
     }
@@ -57,6 +62,7 @@ export default function Search() {
     setQuery('');
     setResults([]);
     setSearched(false);
+    setError(null);
   };
 
   const showMoods   = !searched && results.length === 0;
@@ -67,7 +73,6 @@ export default function Search() {
     <div className={styles.page}>
       {/* SEARCH HERO */}
       <div className={styles.searchHero}>
-        <div className={styles.heroBlob} />
         <h1 className={styles.searchTitle}>Buscar <em>música</em></h1>
         <p className={styles.searchSub}>Encuentra cualquier canción, artista o álbum ♡</p>
         <div className={styles.searchBarWrap}>
@@ -172,8 +177,17 @@ export default function Search() {
         </div>
       )}
 
+      {/* ERROR */}
+      {error && !loading && (
+        <div className={styles.emptyState}>
+          <div className={styles.emptyIcon}>!</div>
+          <div className={styles.emptyTitle}>Sesión expirada</div>
+          <div className={styles.emptySub}>{error}</div>
+        </div>
+      )}
+
       {/* EMPTY */}
-      {showEmpty && (
+      {showEmpty && !error && (
         <div className={styles.emptyState}>
           <div className={styles.emptyIcon}>♪</div>
           <div className={styles.emptyTitle}>Sin resultados</div>

@@ -127,10 +127,6 @@ function hasAllRequiredScopes() {
 }
 
 export async function getValidToken() {
-  if (localStorage.getItem('spotify_access_token') && !hasAllRequiredScopes()) {
-    logout();
-    return null;
-  }
   const expiresAt = parseInt(localStorage.getItem('spotify_token_expires') || '0');
   if (Date.now() > expiresAt - 60000) {
     const result = await refreshAccessToken();
@@ -147,7 +143,7 @@ export function getStoredToken() {
 }
 
 export function isAuthenticated() {
-  return !!localStorage.getItem('spotify_access_token') && hasAllRequiredScopes();
+  return !!localStorage.getItem('spotify_access_token');
 }
 
 export function logout() {
