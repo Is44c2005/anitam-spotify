@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { redirectToSpotifyAuth, isAuthenticated } from '../utils/spotify';
 import styles from './Welcome.module.css';
 
@@ -70,11 +70,7 @@ function FakePlayer() {
 }
 
 export default function Welcome() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated()) navigate('/home', { replace: true });
-  }, [navigate]);
+  if (isAuthenticated()) return <Navigate to="/home" replace />;
 
   return (
     <div className={styles.root}>
