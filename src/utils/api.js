@@ -94,9 +94,12 @@ export async function searchTracks(query, limit = 10) {
   );
 }
 
-export async function searchArtistTrack(artist, track) {
+export async function searchArtistTrack(artist, track, album) {
+  const q = album
+    ? `artist:${artist} track:${track} album:${album}`
+    : `artist:${artist} track:${track}`;
   return fetchSpotify(
-    `/search?q=${encodeURIComponent(`artist:${artist} track:${track}`)}&type=track&limit=1`
+    `/search?q=${encodeURIComponent(q)}&type=track&limit=1`
   );
 }
 

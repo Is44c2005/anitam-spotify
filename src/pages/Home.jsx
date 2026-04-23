@@ -3,7 +3,7 @@ import { getCurrentUser, searchArtistTrack } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
-const START_DATE = new Date('2024-11-24');
+const START_DATE = new Date('2025-11-22');
 
 function getMonthsAndDays() {
   const now = new Date();
@@ -17,7 +17,7 @@ function getMonthsAndDays() {
 
 const SONG_DEFS = [
   { key: 'ourSong',       artist: 'Mon Laferte',  title: 'My One and Only Love' },
-  { key: 'sundayMorning', artist: 'Maroon 5',     title: 'Sunday Morning'       },
+  { key: 'sundayMorning', artist: 'Maroon 5',     title: 'Sunday Morning',      album: 'Songs About Jane' },
   { key: 'somosDos',      artist: 'Bomba Estereo', title: 'Somos Dos'            },
   { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love'             },
   { key: 'circusMaximus', artist: 'Travis Scott',  title: 'Circus Maximus'       },
@@ -40,7 +40,7 @@ export default function Home() {
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => {});
     Promise.allSettled(
-      SONG_DEFS.map(({ artist, title }) => searchArtistTrack(artist, title))
+      SONG_DEFS.map(({ artist, title, album }) => searchArtistTrack(artist, title, album))
     ).then((results) => {
       const found = {};
       results.forEach((result, i) => {
@@ -120,22 +120,22 @@ export default function Home() {
           <div className={styles.timelineWrap}>
             <div className={styles.timelineTrack}>
               <div className={styles.timelineFill} style={{ width: `${Math.min((months / maxMonth) * 100, 100)}%` }} />
+              {TIMELINE_ITEMS.map((item, i) => {
+                const pos     = Math.min((item.month / maxMonth) * 100, 100);
+                const reached = item.month <= months;
+                return (
+                  <div key={i} className={styles.timelineDot} style={{ left: `${pos}%` }}>
+                    <div className={styles.timelineLabel} style={{ color: reached ? 'var(--accent-dark)' : 'var(--text-secondary)' }}>
+                      {item.month === months ? 'hoy' : `mes ${item.month}`}
+                    </div>
+                    <div className={`${styles.timelinePip} ${reached ? styles.timelinePipReached : ''}`} />
+                    <div className={styles.timelineText} style={{ color: reached ? 'var(--ink)' : 'var(--text-secondary)' }}>
+                      {item.label}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            {TIMELINE_ITEMS.map((item, i) => {
-              const pos     = Math.min((item.month / maxMonth) * 100, 100);
-              const reached = item.month <= months;
-              return (
-                <div key={i} className={styles.timelineDot} style={{ left: `${pos}%` }}>
-                  <div className={styles.timelineLabel} style={{ color: reached ? 'var(--accent-dark)' : 'var(--text-secondary)' }}>
-                    {item.month === months ? 'hoy' : `mes ${item.month}`}
-                  </div>
-                  <div className={`${styles.timelinePip} ${reached ? styles.timelinePipReached : ''}`} />
-                  <div className={styles.timelineText} style={{ color: reached ? 'var(--ink)' : 'var(--text-secondary)' }}>
-                    {item.label}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </section>
 

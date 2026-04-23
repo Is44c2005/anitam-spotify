@@ -233,9 +233,8 @@
   background: var(--cream);
   border: 1.5px dashed var(--accent-dark);
   border-radius: 3px;
-  padding: 52px 56px 44px;
+  padding: 64px 48px 56px;
   position: relative;
-  overflow: hidden;
 }
 
 .timelineTrack {
@@ -243,6 +242,7 @@
   height: 4px;
   background: linear-gradient(90deg, var(--accent-soft), var(--accent-main) 60%, var(--accent-soft));
   border-radius: 2px;
+  overflow: visible;
 }
 
 .timelineFill {

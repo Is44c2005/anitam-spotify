@@ -27,9 +27,12 @@ export default function Welcome() {
         <div className={styles.grid}>
           {/* Polaroid */}
           <div className={`${styles.card} ${styles.card1}`}>
-            <div className={styles.polaroidImg}>
-              <div className={styles.polaroidSongName}>My One and Only Love</div>
-              <div className={styles.polaroidSongArtist}>Mon Laferte</div>
+            <div className={styles.albumCover}>
+              <div className={styles.albumVinyl} />
+              <div className={styles.albumOverlay}>
+                <div className={styles.albumSongName}>My One and Only Love</div>
+                <div className={styles.albumSongArtist}>Mon Laferte</div>
+              </div>
             </div>
             <div className={styles.polaroidCaption}>♡ nuestra canción</div>
           </div>
