@@ -142,3 +142,43 @@ img {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Animation library ── */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(var(--rot, 0deg)); }
+  25%      { transform: rotate(calc(var(--rot, 0deg) + 1.5deg)); }
+  75%      { transform: rotate(calc(var(--rot, 0deg) - 1.5deg)); }
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: rotate(var(--rot, 0deg)) translateY(0); }
+  50%      { transform: rotate(var(--rot, 0deg)) translateY(-6px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(.5); }
+  50%      { opacity: 1; transform: scale(1); }
+}
+
+@keyframes popPip {
+  0%   { transform: scale(0); }
+  60%  { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(245,175,175,.35); }
+  50%      { box-shadow: 0 0 0 8px rgba(245,175,175,.55); }
+}
+
+@keyframes floatUpHero {
+  0%   { transform: translateY(0) rotate(-8deg); opacity: 0; }
+  10%  { opacity: .45; }
+  90%  { opacity: .45; }
+  100% { transform: translateY(-380px) rotate(12deg); opacity: 0; }
+}
+
+/* Scroll reveal utility */
+.reveal { opacity: 0; transform: translateY(40px);
+  transition: opacity .8s ease, transform .8s cubic-bezier(.34,1.56,.64,1); }
+.reveal.in { opacity: 1; transform: translateY(0); }

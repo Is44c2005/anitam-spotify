@@ -1,7 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getCurrentUser, searchArtistTrack } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
+
+function useCountUp(target, duration = 1200) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    let raf, start;
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setN(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return n;
+}
+
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { el.classList.add('in'); io.disconnect(); }
+    }, { threshold: 0.15 });
+    io.observe(el); return () => io.disconnect();
+  }, []);
+  return ref;
+}
 
 const START_DATE = new Date('2025-11-22');
 
@@ -52,6 +80,14 @@ export default function Home() {
     });
   }, []);
 
+  const monthsAnim = useCountUp(months, 1400);
+  const daysAnim   = useCountUp(days, 1600);
+  const ourSongRef  = useReveal();
+  const timelineRef = useReveal();
+  const songsRef    = useReveal();
+  const artistRef   = useReveal();
+  const monthRef    = useReveal();
+
   const displayName    = user?.display_name || 'Anitam';
   const avatarUrl      = user?.images?.[0]?.url || null;
   const initials       = displayName.slice(0, 2).toUpperCase();
@@ -69,17 +105,29 @@ export default function Home() {
       <div className={styles.container}>
         {/* HERO */}
         <div className={styles.hero}>
+          <div className={styles.heartField} aria-hidden>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i} className={styles.heartFloat} style={{
+                left: `${(i * 13.7) % 95}%`,
+                fontSize: 14 + (i % 3) * 6,
+                animationDuration: `${9 + (i % 4) * 2}s`,
+                animationDelay: `${i * 0.7}s`,
+              }}>♡</span>
+            ))}
+          </div>
           <div className={styles.helloTag}>hola mi amor,</div>
           <h1 className={styles.heroTitle}>
             {firstName}<span className={styles.heroAccent}>♡</span>
           </h1>
           <div className={styles.heroRow}>
             <div className={styles.counterCard} onClick={() => setShowSecret(true)}>
+              <span className={styles.twinkle} style={{ top: -8, right: 10, animationDelay: '.2s' }}>✦</span>
+              <span className={styles.twinkle} style={{ bottom: -6, left: 14, animationDelay: '1.1s' }}>✦</span>
               <div className={styles.counterHeart}>♡</div>
               <div className={styles.counterInfo}>
                 <div className={styles.counterMono}>llevamos</div>
-                <div className={styles.counterNum}>{months} meses</div>
-                <div className={styles.counterSub}>{days} días ♡ click aquí</div>
+                <div className={styles.counterNum}>{monthsAnim} meses</div>
+                <div className={styles.counterSub}>{daysAnim} días ♡ click aquí</div>
               </div>
             </div>
             <div className={styles.heroQuote}>
@@ -89,7 +137,7 @@ export default function Home() {
         </div>
 
         {/* NUESTRA CANCIÓN */}
-        <section className={styles.section}>
+        <section ref={ourSongRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Nuestra canción</div>
           <div className={styles.sectionSub}>— siempre en repeat ♡</div>
           <div
@@ -114,7 +162,7 @@ export default function Home() {
         </section>
 
         {/* TIMELINE */}
-        <section className={styles.section}>
+        <section ref={timelineRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Meses juntos</div>
           <div className={styles.sectionSub}>— {months} meses · {days} días</div>
           <div className={styles.timelineWrap}>
@@ -140,7 +188,7 @@ export default function Home() {
         </section>
 
         {/* NUESTRAS CANCIONES */}
-        <section className={styles.section}>
+        <section ref={songsRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Nuestras canciones</div>
           <div className={styles.sectionSub}>— solo las nuestras</div>
           <div className={styles.songsGrid}>
@@ -175,7 +223,7 @@ export default function Home() {
         </section>
 
         {/* ARTISTA FAVORITO */}
-        <section className={styles.section}>
+        <section ref={artistRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Tu favorito</div>
           <div className={styles.sectionSub}>— porque sé que te encanta</div>
           <div className={styles.artistCard}>
@@ -191,7 +239,7 @@ export default function Home() {
         </section>
 
         {/* CANCIÓN DEL MES */}
-        <section className={styles.section}>
+        <section ref={monthRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Lo del mes</div>
           <div className={styles.sectionSub}>— en repeat ahora mismo</div>
           {(() => {

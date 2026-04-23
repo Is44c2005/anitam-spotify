@@ -662,6 +662,58 @@
   box-shadow: 5px 5px 0 var(--accent-main);
 }
 
+/* ── Animations added ── */
+.hero { position: relative; overflow: hidden; }
+.heartField { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.heartFloat {
+  position: absolute; bottom: -30px; color: var(--accent-main); opacity: .4;
+  animation: floatUpHero linear infinite;
+}
+.helloTag, .heroTitle, .heroRow { position: relative; z-index: 1; }
+
+.heroAccent { display: inline-block; animation: heartbeat 1.8s ease-in-out infinite; transform-origin: center; }
+
+.counterCard { --rot: -2deg; animation: floatCard 6s ease-in-out infinite; position: relative; }
+.counterCard:hover { animation-play-state: paused; }
+
+.twinkle {
+  position: absolute; font-size: 14px; color: var(--accent-dark);
+  animation: twinkle 2s ease-in-out infinite; pointer-events: none;
+}
+
+.counterNum { font-variant-numeric: tabular-nums; }
+
+.heroQuote { --rot: 3deg; animation: wiggle 5s ease-in-out infinite; }
+
+.ourSong { --rot: -1deg; }
+.ourSong:hover { transform: rotate(0deg) translateY(-4px) scale(1.01); }
+.ourSong:hover .ourSongVinyl { transform: scale(1.08); }
+.ourSongVinyl { transition: transform .3s; }
+
+.songCard { animation: floatCard 8s ease-in-out infinite; }
+.songCard:nth-child(2) { animation-duration: 7s; animation-delay: -2s; }
+.songCard:nth-child(3) { animation-duration: 9s; animation-delay: -4s; }
+.songCard:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.03);
+  animation-play-state: paused;
+}
+
+.songCardActive { animation: glow 2s ease-in-out infinite; }
+
+.timelineDot { animation: popPip .5s cubic-bezier(.34,1.56,.64,1) both; }
+.timelinePipReached { animation: glow 2.5s ease-in-out infinite; }
+.timelineFill { transition: width 1.2s cubic-bezier(.34,1.3,.64,1); }
+
+.artistCard { --rot: -0.8deg; animation: floatCard 10s ease-in-out infinite; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s; }
+.artistCard:hover { transform: rotate(0deg) translate(-3px,-3px) scale(1.01); }
+.artistAvatar { transition: transform .3s; }
+.artistCard:hover .artistAvatar { transform: scale(1.08) rotate(-6deg); }
+.artistGlow { animation: glow 4s ease-in-out infinite; }
+
+.monthCard { --rot: 1deg; animation: floatCard 7s ease-in-out infinite; }
+.monthCard:hover { transform: rotate(0deg) translateY(-4px) scale(1.01); }
+.monthCardActive { animation: glow 2s ease-in-out infinite; }
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .nav { padding: 14px 20px; }
@@ -670,8 +722,9 @@
   .hero { padding: 40px 0 12px; }
   .heroRow { flex-direction: column; align-items: flex-start; }
   .songsGrid { grid-template-columns: 1fr; gap: 20px; }
-  .songCard { transform: none !important; }
+  .songCard { transform: none !important; animation: none; }
   .ourSong { transform: none; }
-  .monthCard { transform: none; }
-  .artistCard { transform: none; }
+  .monthCard { transform: none; animation: none; }
+  .artistCard { transform: none; animation: none; }
+  .counterCard { animation: none; }
 }
