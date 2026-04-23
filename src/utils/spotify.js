@@ -44,6 +44,7 @@ export async function redirectToSpotifyAuth() {
   const codeChallenge = base64urlencode(hashed);
 
   sessionStorage.setItem('code_verifier', codeVerifier);
+  localStorage.setItem('code_verifier', codeVerifier);
 
   const wasLoggedOut = sessionStorage.getItem('explicit_logout') === 'true';
   sessionStorage.removeItem('explicit_logout');
@@ -62,7 +63,9 @@ export async function redirectToSpotifyAuth() {
 }
 
 export async function exchangeCodeForToken(code) {
-  const codeVerifier = sessionStorage.getItem('code_verifier');
+  const codeVerifier =
+    sessionStorage.getItem('code_verifier') ||
+    localStorage.getItem('code_verifier');
 
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -76,6 +79,9 @@ export async function exchangeCodeForToken(code) {
     }),
   });
 
+  sessionStorage.removeItem('code_verifier');
+  localStorage.removeItem('code_verifier');
+
   const data = await response.json();
 
   if (data.access_token) {
@@ -84,7 +90,6 @@ export async function exchangeCodeForToken(code) {
     localStorage.setItem('spotify_refresh_token', data.refresh_token);
     localStorage.setItem('spotify_token_expires', expiresAt.toString());
     localStorage.setItem(SCOPES_KEY, data.scope || SCOPES);
-    sessionStorage.removeItem('code_verifier');
   }
 
   return data;
@@ -163,6 +168,7 @@ export async function forceRelogin() {
   const codeChallenge = base64urlencode(hashed);
 
   sessionStorage.setItem('code_verifier', codeVerifier);
+  localStorage.setItem('code_verifier', codeVerifier);
 
   const params = new URLSearchParams({
     response_type: 'code',
