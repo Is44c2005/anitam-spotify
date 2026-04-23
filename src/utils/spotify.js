@@ -153,3 +153,26 @@ export function logout() {
   localStorage.removeItem(SCOPES_KEY);
   sessionStorage.setItem('explicit_logout', 'true');
 }
+
+export async function forceRelogin() {
+  localStorage.clear();
+  sessionStorage.clear();
+
+  const codeVerifier = generateRandomString(64);
+  const hashed = await sha256(codeVerifier);
+  const codeChallenge = base64urlencode(hashed);
+
+  sessionStorage.setItem('code_verifier', codeVerifier);
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    redirect_uri: REDIRECT_URI,
+    code_challenge_method: 'S256',
+    code_challenge: codeChallenge,
+    show_dialog: 'true',
+  });
+
+  window.location.href = `https://accounts.spotify.com/authorize?${params.toString()}`;
+}

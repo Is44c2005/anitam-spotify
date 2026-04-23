@@ -236,6 +236,26 @@
   opacity: 0.7;
 }
 
+.reconnectBtn {
+  margin-top: 1.25rem;
+  padding: 12px 28px;
+  background: var(--ink, #3a2020);
+  color: var(--cream, #faf6f0);
+  border: 2px solid var(--ink, #3a2020);
+  border-radius: 0;
+  font-family: var(--display-font, serif);
+  font-style: italic;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--accent-main, #f5afaf);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reconnectBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--accent-main, #f5afaf);
+}
+
 @media (max-width: 600px) {
   .hero {
     flex-direction: column;

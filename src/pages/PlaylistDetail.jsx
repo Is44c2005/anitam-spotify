@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPlaylist, getAllPlaylistTracks, removeTracksFromPlaylist, SpotifyApiError } from '../utils/api';
+import { forceRelogin } from '../utils/spotify';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './PlaylistDetail.module.css';
 
@@ -147,11 +148,14 @@ export default function PlaylistDetail() {
         <div className={styles.emptyState}>
           {restricted ? (
             <>
-              <p>No puedo mostrar las canciones de esta playlist 😢</p>
+              <p>No se puede acceder a las canciones de esta playlist 😢</p>
               <p className={styles.emptyHint}>
-                Spotify restringe el acceso a playlists creadas por ellos (Descubrimiento
-                semanal, Radar de novedades, etc.). Prueba con una playlist tuya.
+                Tu sesión puede no tener todos los permisos necesarios.
+                Reconecta tu cuenta para obtener un token actualizado.
               </p>
+              <button className={styles.reconnectBtn} onClick={forceRelogin}>
+                Reconectar Spotify ♡
+              </button>
             </>
           ) : (
             <>
