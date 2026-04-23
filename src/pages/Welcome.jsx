@@ -1,7 +1,81 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { redirectToSpotifyAuth, isAuthenticated } from '../utils/spotify';
 import styles from './Welcome.module.css';
+
+const DURATION = 222; // 3:42 in seconds
+
+function fmt(s) {
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+
+function FakePlayer() {
+  const [playing, setPlaying] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const tickRef = useRef(null);
+
+  useEffect(() => {
+    if (playing) {
+      tickRef.current = setInterval(() => {
+        setSeconds((s) => {
+          if (s >= DURATION) { setPlaying(false); return 0; }
+          return s + 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(tickRef.current);
+    }
+    return () => clearInterval(tickRef.current);
+  }, [playing]);
+
+  const pct = Math.min((seconds / DURATION) * 100, 100);
+
+  return (
+    <div className={styles.fakePlayer}>
+      <div className={styles.fpCover}>
+        <span className={styles.fpCoverInitials}>ML</span>
+        <div className={styles.fpCoverGlow} />
+      </div>
+
+      <div className={styles.fpBody}>
+        <div className={styles.fpTop}>
+          <div className={styles.fpMeta}>
+            <div className={styles.fpBadge}>♡ nuestra canción</div>
+            <div className={styles.fpTitle}>My One and Only Love</div>
+            <div className={styles.fpArtist}>
+              Mon Laferte
+              {playing && (
+                <span className={styles.fpBars}>
+                  {[0, 0.1, 0.2, 0.3].map((d, i) => (
+                    <span key={i} className={styles.fpBar} style={{ animationDelay: `${d}s` }} />
+                  ))}
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            className={`${styles.fpPlayBtn} ${playing ? styles.fpPlayBtnActive : ''}`}
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={playing ? 'Pause' : 'Play'}
+          >
+            {playing ? '⏸' : '▶'}
+          </button>
+        </div>
+
+        <div className={styles.fpProgressWrap}>
+          <div className={styles.fpProgressTrack}>
+            <div className={styles.fpProgressFill} style={{ width: `${pct}%` }} />
+            <div className={styles.fpProgressThumb} style={{ left: `${pct}%` }} />
+          </div>
+          <div className={styles.fpTimes}>
+            <span>{fmt(seconds)}</span>
+            <span>3:42</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -51,12 +125,15 @@ export default function Welcome() {
           <div className={`${styles.card} ${styles.card3}`}>
             <div className={styles.vinylWrapper}>
               <div className={styles.vinyl}>
-                <div className={styles.vinylCenter} />
+                <div className={styles.vinylShine} />
+                <div className={styles.vinylCenter}>A ♡</div>
               </div>
             </div>
-            <div className={styles.vinylCaption}>side A ♡</div>
           </div>
         </div>
+
+        {/* Fake player */}
+        <FakePlayer />
 
         {/* CTA */}
         <div className={styles.bottom}>

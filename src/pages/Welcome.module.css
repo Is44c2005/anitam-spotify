@@ -231,28 +231,55 @@
     #4a2828 70% 72%, #3a2020 72% 100%
   );
   animation: vinylSpin 6s linear infinite;
-  box-shadow: 0 8px 28px rgba(58, 32, 32, 0.3), 0 0 0 4px rgba(245, 175, 175, 0.2);
+  box-shadow:
+    0 8px 28px rgba(58, 32, 32, 0.35),
+    0 0 0 2px rgba(245, 175, 175, 0.25),
+    0 0 0 8px rgba(58, 32, 32, 0.08),
+    0 0 0 14px rgba(58, 32, 32, 0.05),
+    0 0 0 20px rgba(58, 32, 32, 0.03);
   position: relative;
+  transition: animation-duration 0.4s;
+}
+
+.vinyl:hover {
+  animation-duration: 3s;
+}
+
+.vinylShine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(255,255,255,0.08) 15%,
+    transparent 30%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .vinylCenter {
   position: absolute;
-  inset: 42%;
+  inset: 38%;
   border-radius: 50%;
-  background: radial-gradient(circle, #FBEFEF, #F5AFAF);
-  border: 2px solid #c47a7a;
+  background: radial-gradient(circle at 40% 35%, #FBEFEF, #F5AFAF 60%, #c47a7a);
+  border: 1.5px solid rgba(196, 122, 122, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 3px rgba(58,32,32,0.15);
 }
 
 @keyframes vinylSpin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
-}
-
-.vinylCaption {
-  font-family: var(--hand-font);
-  font-size: 22px;
-  color: var(--accent-dark);
-  margin-top: 14px;
 }
 
 /* ── CTA ── */
@@ -299,6 +326,180 @@
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Fake Player ── */
+.fakePlayer {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--cream);
+  border: 1.5px dashed var(--accent-dark);
+  border-radius: 3px;
+  padding: 18px 22px;
+  margin-bottom: 40px;
+  transform: rotate(-0.8deg);
+  box-shadow: 4px 4px 0 var(--accent-main), 0 10px 30px rgba(58,32,32,0.07);
+  animation: fadeInUp 0.9s ease 0.55s both;
+}
+
+.fpCover {
+  width: 72px;
+  height: 72px;
+  border-radius: 3px;
+  background: linear-gradient(135deg, #3a1010, #6b2020 50%, #c47a7a);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 2px 3px 10px rgba(58,32,32,0.25);
+}
+
+.fpCoverInitials {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  position: relative;
+  z-index: 1;
+}
+
+.fpCoverGlow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(245,175,175,0.3), transparent 70%);
+}
+
+.fpBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fpTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.fpMeta { flex: 1; }
+
+.fpBadge {
+  font-family: var(--mono-font);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  margin-bottom: 4px;
+}
+
+.fpTitle {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+.fpArtist {
+  font-family: var(--hand-font);
+  font-size: 15px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fpBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.fpBar {
+  display: inline-block;
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent-dark);
+  animation: barPulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes barPulse {
+  from { transform: scaleY(0.25); }
+  to   { transform: scaleY(1); }
+}
+
+.fpPlayBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 2px 2px 0 var(--accent-main);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fpPlayBtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--accent-main);
+}
+
+.fpPlayBtnActive {
+  background: var(--accent-dark);
+}
+
+.fpProgressWrap { display: flex; flex-direction: column; gap: 5px; }
+
+.fpProgressTrack {
+  position: relative;
+  height: 4px;
+  background: var(--accent-soft);
+  border-radius: 2px;
+}
+
+.fpProgressFill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-main), var(--accent-dark));
+  border-radius: 2px;
+  transition: width 1s linear;
+}
+
+.fpProgressThumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent-dark);
+  border: 2px solid var(--cream);
+  box-shadow: 0 0 0 2px var(--accent-main);
+  transition: left 1s linear;
+}
+
+.fpTimes {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--mono-font);
+  font-size: 10px;
+  color: var(--text-secondary);
 }
 
 /* ── Responsive ── */
