@@ -52,10 +52,10 @@ const SONG_DEFS = [
 ];
 
 const TIMELINE_ITEMS = [
-  { month: 0, label: 'primer beso ♡' },
-  { month: 1, label: 'ya era lo mejor' },
-  { month: 3, label: 'te lo dije' },
-  { month: 5, label: 'hoy ♡' },
+  { month: 0, label: 'te conocí ♡' },
+  { month: 1, label: 'primera playlist juntos' },
+  { month: 3, label: 'nos vimos por primera vez' },
+  { month: 5, label: 'y hoy te has vuelto mi mundo ♡' },
 ];
 
 export default function Home() {
@@ -225,7 +225,7 @@ export default function Home() {
         {/* ARTISTA FAVORITO */}
         <section ref={artistRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>Tu favorito</div>
-          <div className={styles.sectionSub}>— porque sé que te encanta</div>
+          <div className={styles.sectionSub}>— Tu artista más escuchado</div>
           <div className={styles.artistCard}>
             <div className={styles.artistGlow} />
             <div className={styles.artistAvatar}>KR</div>

@@ -119,7 +119,7 @@ export default function Welcome() {
             abrir mi espacio →
           </button>
           <div className={styles.footerText}>
-            — el novio más guapo del mundo 🎀
+            — Desarrollado por el novio más guapo del mundo 🎀
           </div>
         </div>
       </div>
