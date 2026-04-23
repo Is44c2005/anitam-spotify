@@ -31,49 +31,41 @@ function FakePlayer() {
   const pct = Math.min((seconds / DURATION) * 100, 100);
 
   return (
-    <div className={styles.fakePlayer}>
+    <>
       <div className={styles.fpCover}>
         <span className={styles.fpCoverInitials}>ML</span>
         <div className={styles.fpCoverGlow} />
       </div>
 
-      <div className={styles.fpBody}>
-        <div className={styles.fpTop}>
-          <div className={styles.fpMeta}>
-            <div className={styles.fpBadge}>♡ nuestra canción</div>
-            <div className={styles.fpTitle}>My One and Only Love</div>
-            <div className={styles.fpArtist}>
-              Mon Laferte
-              {playing && (
-                <span className={styles.fpBars}>
-                  {[0, 0.1, 0.2, 0.3].map((d, i) => (
-                    <span key={i} className={styles.fpBar} style={{ animationDelay: `${d}s` }} />
-                  ))}
-                </span>
-              )}
-            </div>
-          </div>
-          <button
-            className={`${styles.fpPlayBtn} ${playing ? styles.fpPlayBtnActive : ''}`}
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? 'Pause' : 'Play'}
-          >
-            {playing ? '⏸' : '▶'}
-          </button>
-        </div>
-
-        <div className={styles.fpProgressWrap}>
-          <div className={styles.fpProgressTrack}>
-            <div className={styles.fpProgressFill} style={{ width: `${pct}%` }} />
-            <div className={styles.fpProgressThumb} style={{ left: `${pct}%` }} />
-          </div>
-          <div className={styles.fpTimes}>
-            <span>{fmt(seconds)}</span>
-            <span>3:42</span>
-          </div>
-        </div>
+      <div className={styles.fpBadge}>♡ nuestra canción</div>
+      <div className={styles.fpTitle}>My One and Only Love</div>
+      <div className={styles.fpArtist}>
+        Mon Laferte
+        {playing && (
+          <span className={styles.fpBars}>
+            {[0, 0.1, 0.2, 0.3].map((d, i) => (
+              <span key={i} className={styles.fpBar} style={{ animationDelay: `${d}s` }} />
+            ))}
+          </span>
+        )}
       </div>
-    </div>
+
+      <div className={styles.fpProgressTrack}>
+        <div className={styles.fpProgressFill} style={{ width: `${pct}%` }} />
+      </div>
+
+      <div className={styles.fpControls}>
+        <span className={styles.fpTime}>{fmt(seconds)}</span>
+        <button
+          className={`${styles.fpPlayBtn} ${playing ? styles.fpPlayBtnActive : ''}`}
+          onClick={() => setPlaying((p) => !p)}
+          aria-label={playing ? 'Pause' : 'Play'}
+        >
+          {playing ? '⏸' : '▶'}
+        </button>
+        <span className={styles.fpTime}>3:42</span>
+      </div>
+    </>
   );
 }
 
@@ -99,16 +91,9 @@ export default function Welcome() {
 
         {/* Scrapbook grid */}
         <div className={styles.grid}>
-          {/* Polaroid */}
+          {/* Player card */}
           <div className={`${styles.card} ${styles.card1}`}>
-            <div className={styles.albumCover}>
-              <div className={styles.albumVinyl} />
-              <div className={styles.albumOverlay}>
-                <div className={styles.albumSongName}>My One and Only Love</div>
-                <div className={styles.albumSongArtist}>Mon Laferte</div>
-              </div>
-            </div>
-            <div className={styles.polaroidCaption}>♡ nuestra canción</div>
+            <FakePlayer />
           </div>
 
           {/* Ticket */}
@@ -131,9 +116,6 @@ export default function Welcome() {
             </div>
           </div>
         </div>
-
-        {/* Fake player */}
-        <FakePlayer />
 
         {/* CTA */}
         <div className={styles.bottom}>

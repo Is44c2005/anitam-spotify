@@ -73,11 +73,14 @@
   border-radius: 3px;
 }
 
-/* Polaroid card */
+/* Player card */
 .card1 {
-  padding: 12px 12px 40px;
+  padding: 14px;
   transform: rotate(-3deg);
   box-shadow: 3px 5px 0 rgba(58, 32, 32, 0.07), 0 10px 22px rgba(58, 32, 32, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Ticket card */
@@ -328,99 +331,69 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Fake Player ── */
-.fakePlayer {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  background: var(--cream);
-  border: 1.5px dashed var(--accent-dark);
-  border-radius: 3px;
-  padding: 18px 22px;
-  margin-bottom: 40px;
-  transform: rotate(-0.8deg);
-  box-shadow: 4px 4px 0 var(--accent-main), 0 10px 30px rgba(58,32,32,0.07);
-  animation: fadeInUp 0.9s ease 0.55s both;
-}
-
+/* ── Fake Player (inside card1) ── */
 .fpCover {
-  width: 72px;
-  height: 72px;
-  border-radius: 3px;
-  background: linear-gradient(135deg, #3a1010, #6b2020 50%, #c47a7a);
-  flex-shrink: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 2px;
+  background: linear-gradient(145deg, #1a0808 0%, #3a1010 45%, #7a2828 80%, #c47a7a 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 2px 3px 10px rgba(58,32,32,0.25);
+  box-shadow: 0 4px 14px rgba(58,32,32,0.28);
 }
 
 .fpCoverInitials {
   font-family: var(--display-font);
   font-style: italic;
-  font-size: 22px;
+  font-size: 36px;
   font-weight: 700;
-  color: rgba(255,255,255,0.9);
+  color: rgba(255,255,255,0.88);
   position: relative;
   z-index: 1;
+  letter-spacing: -0.02em;
 }
 
 .fpCoverGlow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 30% 30%, rgba(245,175,175,0.3), transparent 70%);
+  background: radial-gradient(circle at 35% 30%, rgba(245,175,175,0.28), transparent 65%);
 }
-
-.fpBody {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.fpTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.fpMeta { flex: 1; }
 
 .fpBadge {
   font-family: var(--mono-font);
   font-size: 9px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--accent-dark);
-  margin-bottom: 4px;
+  margin-top: 2px;
 }
 
 .fpTitle {
   font-family: var(--display-font);
   font-style: italic;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: var(--ink);
   line-height: 1.2;
 }
 
 .fpArtist {
   font-family: var(--hand-font);
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text-secondary);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .fpBars {
   display: inline-flex;
   align-items: flex-end;
   gap: 2px;
-  height: 14px;
+  height: 13px;
 }
 
 .fpBar {
@@ -429,47 +402,20 @@
   height: 100%;
   border-radius: 2px;
   background: var(--accent-dark);
-  animation: barPulse 0.7s ease-in-out infinite alternate;
+  animation: fpBarPulse 0.7s ease-in-out infinite alternate;
 }
 
-@keyframes barPulse {
-  from { transform: scaleY(0.25); }
+@keyframes fpBarPulse {
+  from { transform: scaleY(0.2); }
   to   { transform: scaleY(1); }
 }
 
-.fpPlayBtn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--cream);
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  box-shadow: 2px 2px 0 var(--accent-main);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.fpPlayBtn:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0 var(--accent-main);
-}
-
-.fpPlayBtnActive {
-  background: var(--accent-dark);
-}
-
-.fpProgressWrap { display: flex; flex-direction: column; gap: 5px; }
-
 .fpProgressTrack {
   position: relative;
-  height: 4px;
+  height: 3px;
   background: var(--accent-soft);
   border-radius: 2px;
+  margin-top: 2px;
 }
 
 .fpProgressFill {
@@ -481,25 +427,41 @@
   transition: width 1s linear;
 }
 
-.fpProgressThumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--accent-dark);
-  border: 2px solid var(--cream);
-  box-shadow: 0 0 0 2px var(--accent-main);
-  transition: left 1s linear;
+.fpControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.fpTimes {
-  display: flex;
-  justify-content: space-between;
+.fpTime {
   font-family: var(--mono-font);
   font-size: 10px;
   color: var(--text-secondary);
+}
+
+.fpPlayBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--accent-main);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fpPlayBtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--accent-main);
+}
+
+.fpPlayBtnActive {
+  background: var(--accent-dark);
 }
 
 /* ── Responsive ── */
