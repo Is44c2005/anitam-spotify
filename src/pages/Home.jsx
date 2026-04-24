@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { getCurrentUser, searchArtistTrack } from '../utils/api';
+import { getCurrentUser, searchArtistTrack, searchArtist } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
@@ -62,6 +62,7 @@ export default function Home() {
   const [user, setUser]             = useState(null);
   const [showSecret, setShowSecret] = useState(false);
   const [spotifyTracks, setSpotifyTracks] = useState({});
+  const [spotifyArtist, setSpotifyArtist] = useState(null);
   const { months, days } = getMonthsAndDays();
   const { play, currentTrack, isPlaying } = usePlayer();
 
@@ -78,6 +79,7 @@ export default function Home() {
       });
       setSpotifyTracks(found);
     });
+    searchArtist('Chris R').then(d => setSpotifyArtist(d?.artists?.items?.[0] ?? null)).catch(() => {});
   }, []);
 
   const monthsAnim = useCountUp(months, 1400);
@@ -228,11 +230,16 @@ export default function Home() {
           <div className={styles.sectionSub}>— Tu artista más escuchado</div>
           <div className={styles.artistCard}>
             <div className={styles.artistGlow} />
-            <div className={styles.artistAvatar}>KR</div>
+            {spotifyArtist?.images?.[0]?.url
+              ? <img src={spotifyArtist.images[0].url} alt={spotifyArtist.name} className={styles.artistAvatar} style={{ objectFit: 'cover' }} />
+              : <div className={styles.artistAvatar}>KR</div>
+            }
             <div className={styles.artistInfo}>
               <div className={styles.artistBadge}>♡ tu favorito</div>
-              <div className={styles.artistName}>Kris.R</div>
-              <div className={styles.artistSub}>R&amp;B · Soul · Alternativo</div>
+              <div className={styles.artistName}>{spotifyArtist?.name || 'Kris.R'}</div>
+              <div className={styles.artistSub}>
+                {spotifyArtist?.genres?.slice(0,3).join(' · ') || 'R&B · Soul · Alternativo'}
+              </div>
               <div className={styles.artistNote}>"porque sé que te encanta" — tu novio</div>
             </div>
           </div>

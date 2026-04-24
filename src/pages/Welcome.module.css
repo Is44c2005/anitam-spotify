@@ -375,13 +375,17 @@
   width: 100%;
   aspect-ratio: 1;
   border-radius: 2px;
-  background: linear-gradient(145deg, #1a0808 0%, #3a1010 45%, #7a2828 80%, #c47a7a 100%);
+  background: linear-gradient(160deg, #FBEFEF 0%, #F9DFDF 100%);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(58,32,32,0.28);
+  box-shadow: 0 4px 14px rgba(58,32,32,0.10);
+  padding: 20px;
+  box-sizing: border-box;
+  gap: 8px;
 }
 
 .fpCoverInitials {
@@ -399,6 +403,22 @@
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 35% 30%, rgba(245,175,175,0.28), transparent 65%);
+}
+
+.fpCoverHeart {
+  font-size: 18px;
+  color: #F5AFAF;
+  line-height: 1;
+}
+
+.fpCoverPhrase {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 13px;
+  color: #c47a7a;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .fpBadge {

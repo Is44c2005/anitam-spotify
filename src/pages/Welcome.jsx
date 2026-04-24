@@ -33,8 +33,10 @@ function FakePlayer() {
   return (
     <>
       <div className={styles.fpCover}>
-        <span className={styles.fpCoverInitials}>ML</span>
-        <div className={styles.fpCoverGlow} />
+        <span className={styles.fpCoverHeart}>♡</span>
+        <p className={styles.fpCoverPhrase}>
+          Tú eres mi one and only love y tú eres lo que siempre yo soñé
+        </p>
       </div>
 
       <div className={styles.fpBadge}>♡ nuestra canción</div>
