@@ -253,36 +253,51 @@
   letter-spacing: 0.1em;
 }
 
-/* Vinyl */
-.vinylWrapper {
+/* Cassette */
+.cassettWrapper {
   position: relative;
-  width: 138px;
-  height: 138px;
+  width: 140px;
+  height: 100px;
+  animation: fadeInUp 0.9s ease 0.8s both;
 }
 
-.vinyl {
-  width: 138px;
-  height: 138px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle at center,
-    #c47a7a 0 6%, #3a2020 6.5% 22%, #4a2828 22% 24%,
-    #3a2020 24% 46%, #4a2828 46% 48%, #3a2020 48% 70%,
-    #4a2828 70% 72%, #3a2020 72% 100%
-  );
-  animation: vinylSpin 6s linear infinite;
-  box-shadow:
-    0 8px 28px rgba(58, 32, 32, 0.35),
-    0 0 0 2px rgba(245, 175, 175, 0.25),
-    0 0 0 8px rgba(58, 32, 32, 0.08),
-    0 0 0 14px rgba(58, 32, 32, 0.05),
-    0 0 0 20px rgba(58, 32, 32, 0.03);
-  position: relative;
-  transition: animation-duration 0.4s;
+.cassette {
+  width: 140px;
+  height: 100px;
+  box-shadow: 0 8px 32px rgba(245, 175, 175, 0.3);
+  transition: filter 0.3s ease;
 }
 
-.vinyl:hover {
-  animation-duration: 3s;
+.cassette:hover {
+  filter: drop-shadow(0 0 12px rgba(245, 175, 175, 0.4));
+}
+
+.cassette:hover .reelLeft {
+  animation-duration: 1.5s !important;
+}
+
+.cassette:hover .reelRight {
+  animation-duration: 1.5s !important;
+}
+
+@keyframes cassetteReelLeft {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes cassetteReelRight {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+.reelLeft {
+  transform-origin: 35px 50px;
+  animation: cassetteReelLeft 4s linear infinite;
+}
+
+.reelRight {
+  transform-origin: 105px 50px;
+  animation: cassetteReelRight 4s linear infinite;
 }
 
 .vinylShine {

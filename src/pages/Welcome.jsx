@@ -35,7 +35,7 @@ function FakePlayer() {
       <div className={styles.fpCover}>
         <span className={styles.fpCoverHeart}>♡</span>
         <p className={styles.fpCoverPhrase}>
-          Tú eres mi one and only love y tú eres lo que siempre yo soñé
+          Tú eres mi one and only love y con lo que siempre soñe
         </p>
       </div>
 
@@ -104,13 +104,37 @@ export default function Welcome() {
             <div className={styles.ticketBottom}>VOL. 01 · NOV 2025</div>
           </div>
 
-          {/* Vinyl polaroid */}
+          {/* Cassette polaroid */}
           <div className={`${styles.card} ${styles.card3}`}>
-            <div className={styles.vinylWrapper}>
-              <div className={styles.vinyl}>
-                <div className={styles.vinylShine} />
-                <div className={styles.vinylCenter}>A ♡</div>
-              </div>
+            <div className={styles.cassettWrapper}>
+              <svg className={styles.cassette} width="140" height="100" viewBox="0 0 140 100" xmlns="http://www.w3.org/2000/svg">
+                {/* Cuerpo principal */}
+                <rect x="10" y="15" width="120" height="70" rx="4" fill="white" stroke="#F9DFDF" strokeWidth="2"/>
+
+                {/* Etiqueta/centro */}
+                <rect x="30" y="30" width="80" height="40" fill="#F5AFAF" rx="2"/>
+                <text x="70" y="58" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#c47a7a">♡</text>
+
+                {/* Carrete izquierdo - grupo para rotación */}
+                <g className={styles.reelLeft}>
+                  <circle cx="35" cy="50" r="18" fill="none" stroke="#3a2020" strokeWidth="2"/>
+                  <circle cx="35" cy="50" r="12" fill="none" stroke="#3a2020" strokeWidth="1.5"/>
+                  <circle cx="35" cy="50" r="6" fill="#c47a7a"/>
+                  <line x1="35" y1="32" x2="35" y2="26" stroke="#3a2020" strokeWidth="1.5"/>
+                </g>
+
+                {/* Carrete derecho - grupo para rotación */}
+                <g className={styles.reelRight}>
+                  <circle cx="105" cy="50" r="18" fill="none" stroke="#3a2020" strokeWidth="2"/>
+                  <circle cx="105" cy="50" r="12" fill="none" stroke="#3a2020" strokeWidth="1.5"/>
+                  <circle cx="105" cy="50" r="6" fill="#c47a7a"/>
+                  <line x1="105" y1="32" x2="105" y2="26" stroke="#3a2020" strokeWidth="1.5"/>
+                </g>
+
+                {/* Cinta entre los carretes */}
+                <path d="M 53 46 Q 70 44 87 46" fill="none" stroke="#3a2020" strokeWidth="2.5"/>
+                <path d="M 53 54 Q 70 56 87 54" fill="none" stroke="#3a2020" strokeWidth="2.5"/>
+              </svg>
             </div>
           </div>
         </div>
