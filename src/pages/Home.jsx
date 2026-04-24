@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { getCurrentUser, getArtist } from '../utils/api';
-import { getValidToken } from '../utils/spotify';
+import { getCurrentUser, searchArtistTrack, getArtist } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
@@ -54,15 +53,6 @@ const SONG_DEFS = [
   { key: 'conLosDosCabeza', artist: 'Pedro Guerra', title: 'Con los Dos en la Cabeza' },
 ];
 
-const SONG_TRACK_IDS = [
-  '1EWqyMpJYaUZEUHgqSwBBL',
-  '0K8TnWM6ym1HwFE0pVmm7e',
-  '7GjR3GujmHUe1RXYr0J49o',
-  '0cAqpEGGRBbXfTpQv1LiRd',
-  '1YC6fYVa74luzF0GcMkv7w',
-  '2PdMSFHq2YHBZ3aVUDMCzL',
-];
-
 const TIMELINE_ITEMS = [
   { month: 0, label: 'te conocí ♡' },
   { month: 1, label: 'primera playlist juntos' },
@@ -80,34 +70,17 @@ export default function Home() {
 
   useEffect(() => {
     getCurrentUser().then(setUser).catch(() => {});
-
-    const fetchTracks = async () => {
-      try {
-        const token = await getValidToken();
-        if (!token) return;
-
-        const ids = SONG_TRACK_IDS.join(',');
-        const response = await fetch(
-          `https://api.spotify.com/v1/tracks?ids=${ids}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const tracks = data.tracks || [];
-
-        const found = {};
-        SONG_DEFS.forEach((song, i) => {
-          found[song.key] = tracks[i] ?? null;
-        });
-        setSpotifyTracks(found);
-      } catch (error) {
-        console.error('Error fetching tracks:', error);
-      }
-    };
-
-    fetchTracks();
+    Promise.allSettled(
+      SONG_DEFS.map(({ artist, title, album }) => searchArtistTrack(artist, title, album))
+    ).then((results) => {
+      const found = {};
+      results.forEach((result, i) => {
+        if (result.status === 'fulfilled') {
+          found[SONG_DEFS[i].key] = result.value?.tracks?.items?.[0] ?? null;
+        }
+      });
+      setSpotifyTracks(found);
+    });
     getArtist('3i6lAgVHplDXb6zrjIeBeK').then(setSpotifyArtist).catch(() => {});
   }, []);
 
