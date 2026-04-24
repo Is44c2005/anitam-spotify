@@ -45,31 +45,54 @@ export default function OurSongs() {
   const songsRef = useReveal();
 
   useEffect(() => {
-    const fetchTracks = async () => {
+    const fetchSpotifyData = async () => {
       try {
         const token = await getValidToken();
+        if (!token) {
+          setSongs(SONGS);
+          return;
+        }
+
         const ids = SONGS.map(s => s.id).join(',');
         const response = await fetch(`https://api.spotify.com/v1/tracks?ids=${ids}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         });
-        if (!response.ok) throw new Error('fetch failed');
+
+        if (!response.ok) {
+          setSongs(SONGS);
+          return;
+        }
+
         const data = await response.json();
         const tracks = data.tracks || [];
-        setSongs(SONGS.map((song, i) => {
+
+        const updatedSongs = SONGS.map((song, i) => {
           const track = tracks[i];
-          return {
-            ...song,
-            spotifyName: track?.name,
-            spotifyArtist: track?.artists?.[0]?.name,
-            coverUrl: track?.album?.images?.[0]?.url,
-            trackObj: track,
-          };
-        }));
-      } catch {
+          if (track) {
+            return {
+              ...song,
+              spotifyName: track.name,
+              spotifyArtist: track.artists?.[0]?.name,
+              coverUrl: track.album?.images?.[0]?.url,
+              previewUrl: track.preview_url,
+              trackObj: track,
+            };
+          }
+          return song;
+        });
+
+        setSongs(updatedSongs);
+      } catch (error) {
+        console.error('Error fetching Spotify tracks:', error);
         setSongs(SONGS);
       }
     };
-    fetchTracks();
+
+    fetchSpotifyData();
   }, []);
 
   function getInitials(name) {
@@ -81,6 +104,12 @@ export default function OurSongs() {
     let hash = 0;
     for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
     return colors[Math.abs(hash) % colors.length];
+  }
+
+  function handlePlay(song) {
+    if (song.trackObj) {
+      play(song.trackObj);
+    }
   }
 
   return (
@@ -103,17 +132,19 @@ export default function OurSongs() {
           <div className={styles.sectionTitle}>todas las nuestras</div>
           <div className={styles.sectionSub}>— nuestra playlist completa ♡</div>
           <div className={styles.trackList}>
-            {songs.map(({ n, vibe, name, artist, coverUrl, trackObj, spotifyName, spotifyArtist }) => {
-              const displayName = spotifyName || name;
-              const displayArtist = spotifyArtist || artist;
+            {songs.map((song) => {
+              const { n, vibe, name, artist, coverUrl, trackObj } = song;
+              const displayName = song.spotifyName || name;
+              const displayArtist = song.spotifyArtist || artist;
               const active = isPlaying && currentTrack?.id === trackObj?.id;
               const initials = getInitials(displayName);
               const bgColor = getColorFromName(displayName);
+
               return (
                 <div
                   key={n}
                   className={`${styles.trackRow} ${active ? styles.trackRowActive : ''}`}
-                  onClick={() => trackObj && play(trackObj)}
+                  onClick={() => handlePlay(song)}
                   style={{ cursor: trackObj ? 'pointer' : 'default' }}
                 >
                   <span className={styles.trackNum}>{String(n).padStart(2, '0')}</span>
