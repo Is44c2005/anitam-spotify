@@ -79,7 +79,7 @@ export default function Home() {
       });
       setSpotifyTracks(found);
     });
-    searchArtist('Chris R').then(d => setSpotifyArtist(d?.artists?.items?.[0] ?? null)).catch(() => {});
+    searchArtist('Kris R').then(d => setSpotifyArtist(d?.artists?.items?.[0] ?? null)).catch(() => {});
   }, []);
 
   const monthsAnim = useCountUp(months, 1400);
