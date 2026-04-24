@@ -55,6 +55,7 @@ export default function OurSongs() {
   const navigate = useNavigate();
   const { play, currentTrack, isPlaying } = usePlayer();
   const [songs, setSongs] = useState(SONGS.map((s, i) => ({ ...s, n: i + 1, loading: true })));
+  const [hoveredRow, setHoveredRow] = useState(null);
 
   const songsRef = useReveal();
 
@@ -69,31 +70,42 @@ export default function OurSongs() {
 
         const searchPromises = SONGS.map(async (song) => {
           try {
-            let query = encodeURIComponent(`${song.name} ${song.artist}`);
-            let limit = 1;
+            let response;
 
-            // Corrección 1: Patadas de Ahogado - filtrar remixes
-            if (song.name === 'Patadas de Ahogado') {
-              limit = 10;
-            }
-
-            // Corrección 2: Eres - búsqueda específica para Grupo Niche
+            // Corrección 1: Eres - usar Track ID directo
             if (song.name === 'Eres') {
-              query = encodeURIComponent('Eres Grupo Niche');
-            }
+              response = await fetch(
+                'https://api.spotify.com/v1/tracks/2PgKHMmSYEyDU0HJKWXMAM',
+                { headers: { 'Authorization': `Bearer ${token}` } }
+              );
+            } else {
+              let query = encodeURIComponent(`${song.name} ${song.artist}`);
+              let limit = 1;
 
-            const response = await fetch(
-              `https://api.spotify.com/v1/search?q=${query}&type=track&limit=${limit}`,
-              { headers: { 'Authorization': `Bearer ${token}` } }
-            );
+              // Patadas de Ahogado - filtrar remixes
+              if (song.name === 'Patadas de Ahogado') {
+                limit = 10;
+              }
+
+              response = await fetch(
+                `https://api.spotify.com/v1/search?q=${query}&type=track&limit=${limit}`,
+                { headers: { 'Authorization': `Bearer ${token}` } }
+              );
+            }
 
             if (!response.ok) return null;
             const data = await response.json();
-            let track = data.tracks?.items?.[0];
 
-            // Para Patadas de Ahogado, filtrar remixes
-            if (song.name === 'Patadas de Ahogado' && data.tracks?.items) {
-              track = data.tracks.items.find(t => !t.name.includes('Remix') && !t.name.includes('remix') && !t.name.includes('REMIX')) || data.tracks.items[0];
+            let track;
+            if (song.name === 'Eres') {
+              track = data;
+            } else {
+              track = data.tracks?.items?.[0];
+
+              // Para Patadas de Ahogado, filtrar remixes
+              if (song.name === 'Patadas de Ahogado' && data.tracks?.items) {
+                track = data.tracks.items.find(t => !t.name.includes('Remix') && !t.name.includes('remix') && !t.name.includes('REMIX')) || data.tracks.items[0];
+              }
             }
 
             if (track) {
@@ -159,8 +171,8 @@ export default function OurSongs() {
         </button>
 
         <div className={styles.hero}>
-          <div className={styles.tagline}>— las que suenan cuando pienso en ti —</div>
-          <h1 className={styles.heroTitle}>
+          <div className={`${styles.tagline} ${styles.fadeInUp}`}>— las que suenan cuando pienso en ti —</div>
+          <h1 className={`${styles.heroTitle} ${styles.fadeInUp}`}>
             Nuestras <span className={styles.heroAccent}>canciones</span>
             <span className={styles.heroHeart}>♡</span>
           </h1>
@@ -179,9 +191,11 @@ export default function OurSongs() {
               return (
                 <div
                   key={n}
-                  className={`${styles.trackRow} ${active ? styles.trackRowActive : ''}`}
+                  className={`${styles.trackRow} ${active ? styles.trackRowActive : ''} ${styles.fadeInUpRow}`}
                   onClick={() => handlePlay(song)}
-                  style={{ cursor: track ? 'pointer' : 'default' }}
+                  onMouseEnter={() => setHoveredRow(n)}
+                  onMouseLeave={() => setHoveredRow(null)}
+                  style={{ cursor: track ? 'pointer' : 'default', animationDelay: `${n * 0.05}s` }}
                 >
                   <span className={styles.trackNum}>{String(n).padStart(2, '0')}</span>
 
@@ -204,7 +218,7 @@ export default function OurSongs() {
                     <div className={styles.trackArtist}>{artist}</div>
                   </div>
                   <div className={styles.trackLabel}>
-                    {track ? '♫' : '—'}
+                    {hoveredRow === n ? '♡' : (track ? '♫' : '—')}
                   </div>
                 </div>
               );
