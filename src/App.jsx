@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import Playlists from './pages/Playlists';
 import PlaylistDetail from './pages/PlaylistDetail';
+import OurSongs from './pages/OurSongs';
 import Navbar from './components/Navbar';
 import Player from './components/Player';
 import Footer from './components/Footer';
@@ -117,6 +118,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <AppLayout><PlaylistDetail /></AppLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/our-songs"
+            element={
+              <ProtectedRoute>
+                <AppLayout><OurSongs /></AppLayout>
               </ProtectedRoute>
             }
           />

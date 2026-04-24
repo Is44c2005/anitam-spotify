@@ -714,6 +714,30 @@
 .monthCard:hover { transform: rotate(0deg) translateY(-4px) scale(1.01); }
 .monthCardActive { animation: glow 2s ease-in-out infinite; }
 
+.viewAllWrap {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.viewAllBtn {
+  display: inline-block;
+  font-family: var(--mono-font);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  border: 1px solid var(--accent-main);
+  padding: 6px 18px;
+  border-radius: 99px;
+  text-decoration: none;
+  transition: var(--spring);
+}
+
+.viewAllBtn:hover {
+  background: var(--accent-main);
+  color: #fff;
+}
+
 /* ── Responsive ── */
 @media (max-width: 600px) {
   .nav { padding: 14px 20px; }

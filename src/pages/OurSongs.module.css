@@ -1,0 +1,335 @@
+.page {
+  min-height: 100vh;
+  font-family: var(--body-font);
+  padding-bottom: 120px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ── Hero ── */
+.hero {
+  padding: 48px 0 20px;
+}
+
+.tagline {
+  font-family: var(--hand-font);
+  font-size: 18px;
+  color: var(--accent-dark);
+  transform: rotate(-1.5deg);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.heroTitle {
+  font-family: var(--display-font);
+  font-size: clamp(48px, 8vw, 88px);
+  font-weight: 700;
+  font-style: italic;
+  color: var(--ink);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.heroAccent {
+  color: var(--accent-dark);
+}
+
+.heroHeart {
+  color: var(--accent-main);
+  font-size: 1.2em;
+  margin-left: 4px;
+}
+
+.backBtn {
+  display: block;
+  font-family: var(--mono-font);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin-bottom: 24px;
+  transition: var(--spring);
+  text-decoration: none;
+}
+
+.backBtn:hover {
+  text-decoration: underline;
+}
+
+/* ── Section ── */
+.section {
+  margin-top: 64px;
+}
+
+.sectionTitle {
+  font-family: var(--hand-font);
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 700;
+  color: var(--ink);
+  transform: rotate(-1.5deg);
+  display: inline-block;
+  line-height: 1;
+}
+
+.sectionSub {
+  font-family: var(--hand-font);
+  font-size: 18px;
+  color: var(--accent-dark);
+  transform: rotate(-1deg);
+  margin-top: -4px;
+  margin-left: 20px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* ── Songs Grid ── */
+.songsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.songCard {
+  background: var(--cream);
+  border: 1px solid rgba(196, 122, 122, 0.18);
+  border-radius: 3px;
+  padding: 12px 12px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  box-shadow: 2px 4px 0 rgba(58, 32, 32, 0.06), 0 8px 20px rgba(58, 32, 32, 0.05);
+  transition: var(--spring);
+  animation: floatCard 8s ease-in-out infinite;
+}
+
+.songCard:nth-child(2) {
+  animation-duration: 7s;
+  animation-delay: -2s;
+}
+
+.songCard:nth-child(3) {
+  animation-duration: 9s;
+  animation-delay: -4s;
+}
+
+.songCard:nth-child(4) {
+  animation-duration: 8.5s;
+  animation-delay: -3s;
+}
+
+.songCard:hover {
+  transform: rotate(0deg) translateY(-6px) scale(1.03);
+  animation-play-state: paused;
+}
+
+.songCardImg {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.songCardCover {
+  width: 100%;
+  aspect-ratio: 1;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--accent-soft), var(--accent-soft) 10px,
+    var(--bg-secondary) 10px, var(--bg-secondary) 20px
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--accent-dark);
+  border-radius: 2px;
+}
+
+.songCardActive {
+  outline: 2.5px solid var(--accent-dark);
+  outline-offset: 2px;
+  animation: glow 2s ease-in-out infinite;
+}
+
+.songCardPill {
+  font-family: var(--mono-font);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  border: 1px solid var(--accent-main);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+.songCardName {
+  font-family: var(--body-font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.songCardArtist {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* ── Track List ── */
+.trackList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--cream);
+  border: 1px solid rgba(196, 122, 122, 0.15);
+  border-radius: 3px;
+  transition: var(--spring);
+}
+
+.trackRow:hover {
+  background: var(--bg-secondary);
+}
+
+.trackRowActive {
+  border-color: var(--accent-dark);
+  outline: 1.5px solid var(--accent-dark);
+  animation: glow 2s ease-in-out infinite;
+}
+
+.trackNum {
+  font-family: var(--mono-font);
+  font-size: 11px;
+  color: var(--text-secondary);
+  width: 22px;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.trackCover {
+  width: 40px;
+  height: 40px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.trackCoverFallback {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-soft);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--accent-dark);
+  flex-shrink: 0;
+}
+
+.trackInfo {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.trackName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.trackArtist {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trackLabel {
+  font-family: var(--mono-font);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  border: 1px solid var(--accent-main);
+  padding: 2px 8px;
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Footer ── */
+.footerText {
+  margin-top: 60px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .songsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 0 16px;
+  }
+  .hero {
+    padding: 32px 0 12px;
+  }
+  .heroTitle {
+    font-size: clamp(36px, 7vw, 60px);
+  }
+  .songsGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .songCard {
+    transform: none !important;
+    animation: none;
+  }
+  .trackRow {
+    gap: 10px;
+    padding: 8px 10px;
+  }
+  .trackNum {
+    font-size: 9px;
+  }
+  .trackCover, .trackCoverFallback {
+    width: 32px;
+    height: 32px;
+  }
+  .trackName {
+    font-size: 12px;
+  }
+  .trackArtist {
+    font-size: 10px;
+  }
+}

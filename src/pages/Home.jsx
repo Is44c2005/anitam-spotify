@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { getCurrentUser, searchArtistTrack, getArtist } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
@@ -221,6 +222,9 @@ export default function Home() {
                 </div>
               );
             })}
+          </div>
+          <div className={styles.viewAllWrap}>
+            <Link to="/our-songs" className={styles.viewAllBtn}>ver todas ♡ →</Link>
           </div>
         </section>
 
