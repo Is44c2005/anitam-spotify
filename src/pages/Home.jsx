@@ -243,9 +243,9 @@ export default function Home() {
               <div className={styles.artistBadge}>♡ tu favorito</div>
               <div className={styles.artistName}>{spotifyArtist?.name || 'Kris.R'}</div>
               <div className={styles.artistSub}>
-                {spotifyArtist?.genres?.slice(0,3).join(' · ') || 'R&B · Soul · Alternativo'}
+                {spotifyArtist?.genres?.slice(0,3).join(' · ') || 'Trap · Reggaetón '}
               </div>
-              <div className={styles.artistNote}>"porque sé que te encanta" — tu novio</div>
+              <div className={styles.artistNote}>"Usted sabe que, hace tiempo, le llevo ganas" — tu novio</div>
             </div>
           </div>
         </section>

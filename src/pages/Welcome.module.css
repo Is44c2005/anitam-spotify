@@ -543,6 +543,16 @@
   to   { opacity: 1; transform: translateY(0)    rotate(var(--rot, 0deg)); }
 }
 
+.cassettePhrase {
+  font-family: var(--display-font);
+  font-style: italic;
+  font-size: 15px;
+  color: #c47a7a;
+  text-align: center;
+  margin-top: 12px;
+  animation-delay: 0.3s;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   .root { padding: 32px 20px; }

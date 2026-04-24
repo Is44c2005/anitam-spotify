@@ -136,6 +136,7 @@ export default function Welcome() {
                 <path d="M 53 54 Q 70 56 87 54" fill="none" stroke="#3a2020" strokeWidth="2.5"/>
               </svg>
             </div>
+            <div className={`${styles.cassettePhrase} ${styles.fadeInUp}`}>para mi Clic ♡</div>
           </div>
         </div>
 
