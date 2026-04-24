@@ -69,15 +69,32 @@ export default function OurSongs() {
 
         const searchPromises = SONGS.map(async (song) => {
           try {
-            const query = encodeURIComponent(`${song.name} ${song.artist}`);
+            let query = encodeURIComponent(`${song.name} ${song.artist}`);
+            let limit = 1;
+
+            // Corrección 1: Patadas de Ahogado - filtrar remixes
+            if (song.name === 'Patadas de Ahogado') {
+              limit = 10;
+            }
+
+            // Corrección 2: Eres - búsqueda específica para Grupo Niche
+            if (song.name === 'Eres') {
+              query = encodeURIComponent('Eres Grupo Niche');
+            }
+
             const response = await fetch(
-              `https://api.spotify.com/v1/search?q=${query}&type=track&limit=1`,
+              `https://api.spotify.com/v1/search?q=${query}&type=track&limit=${limit}`,
               { headers: { 'Authorization': `Bearer ${token}` } }
             );
 
             if (!response.ok) return null;
             const data = await response.json();
-            const track = data.tracks?.items?.[0];
+            let track = data.tracks?.items?.[0];
+
+            // Para Patadas de Ahogado, filtrar remixes
+            if (song.name === 'Patadas de Ahogado' && data.tracks?.items) {
+              track = data.tracks.items.find(t => !t.name.includes('Remix') && !t.name.includes('remix') && !t.name.includes('REMIX')) || data.tracks.items[0];
+            }
 
             if (track) {
               return {

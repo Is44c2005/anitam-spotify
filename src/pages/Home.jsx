@@ -50,6 +50,7 @@ const SONG_DEFS = [
   { key: 'somosDos',      artist: 'Bomba Estereo', title: 'Somos Dos'            },
   { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love'             },
   { key: 'circusMaximus', artist: 'Travis Scott',  title: 'Circus Maximus'       },
+  { key: 'conLosDosCabeza', artist: 'Pedro Guerra', title: 'Con los Dos en la Cabeza' },
 ];
 
 const TIMELINE_ITEMS = [
@@ -271,6 +272,33 @@ export default function Home() {
                   <div className={styles.monthBadge}>◆ del mes</div>
                   <div className={styles.monthName}>Circus Maximus</div>
                   <div className={styles.monthArtist}>Travis Scott</div>
+                </div>
+                <div className={styles.monthBars}>
+                  {[8, 18, 12, 18].map((h, i) => (
+                    <div key={i} className={styles.mbar} style={{ height: h, animationDelay: `${i * 0.08}s` }} />
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+          {(() => {
+            const track    = spotifyTracks.conLosDosCabeza;
+            const coverUrl = track?.album?.images?.[0]?.url;
+            const active   = isPlaying && currentTrack?.id === track?.id;
+            return (
+              <div
+                className={`${styles.monthCard} ${active ? styles.monthCardActive : ''}`}
+                onClick={() => handlePlay(track)}
+                style={{ cursor: track ? 'pointer' : 'default' }}
+              >
+                {coverUrl
+                  ? <img src={coverUrl} alt="Con los Dos en la Cabeza" className={styles.monthCoverImg} />
+                  : <div className={styles.monthCover}>🎸</div>
+                }
+                <div className={styles.monthInfo}>
+                  <div className={styles.monthBadge}>🎵 del mes</div>
+                  <div className={styles.monthName}>Con los Dos en la Cabeza</div>
+                  <div className={styles.monthArtist}>Pedro Guerra</div>
                 </div>
                 <div className={styles.monthBars}>
                   {[8, 18, 12, 18].map((h, i) => (
