@@ -44,13 +44,10 @@ const TRACK_IDS = [
   '5qqabIl2vWzo9ApSC317sa', '2P4OICZRVAQcYAV2JReRfj', '4GKm1QaEr1tqJwUM0EsUl3',
   '4WefXOf8I4gMjdj2kBJgkl', '5F6ekGcdu623mkhTVgk64Z', '2OcTokSU4FnEaIMpNSAh9F',
   '0T5iIrXA4p5GsubkhuBIKV', '2qpacEyFxmbxCpIEqZkqvC', '7qWfrXUmYD2UG82tI0pfKm',
-  '35uxk7hvSZBfEgScbcagZI', '3cL9ePuG6NGlmUmXEbOfpG', '0ofHAoxe9vBkTCp2UQIavz',
+  '35uxk7hvSZBfEgScbcagZI', '3cL9ePuG6NGlmUmXEbOfpG', '3t3jGDeU3t1ro51C3x2pPR',
   '3mM00GfVOfqBYFfPtQPgdm', '4bIzPNFSCWqnKiAXerPIAq', '4wJBWMDkbRUXGQHtkFoFOj',
-  '7nZmah2llfvLDiUjm0kiyz', '3t3jGDeU3t1ro51C3x2pPR', '5mg6sU732O35VMfCYk3lmX',
-  '1aBJ5ljG2GalxEl01vQn04', '17LdmV5cIcTvxB0O18tD2Z', '3t3jGDeU3t1ro51C3x2pPR',
-  '5mg6sU732O35VMfCYk3lmX', '1aBJ5ljG2GalxEl01vQn04', '17LdmV5cIcTvxB0O18tD2Z',
-  '3cL9ePuG6NGlmUmXEbOfpG', '2PgKHMmSYEyDU0HJKWXMAM', '35uxk7hvSZBfEgScbcagZI',
-  '7qWfrXUmYD2UG82tI0pfKm', '2qpacEyFxmbxCpIEqZkqvC',
+  '7nZmah2llfvLDiUjm0kiyz', '5mg6sU732O35VMfCYk3lmX', '1aBJ5ljG2GalxEl01vQn04',
+  '17LdmV5cIcTvxB0O18tD2Z', '2PgKHMmSYEyDU0HJKWXMAM',
 ];
 
 function useReveal() {
@@ -74,6 +71,28 @@ export default function OurSongs() {
   const songsRef = useReveal();
 
   useEffect(() => {
+    const cached = sessionStorage.getItem('ourSongsData');
+    if (cached) {
+      try {
+        const tracks = JSON.parse(cached);
+        setSongs(SONGS.map((song, i) => {
+          const track = tracks[i];
+          return {
+            ...song,
+            n: i + 1,
+            loading: false,
+            coverUrl: track?.album?.images?.[1]?.url,
+            uri: track?.uri,
+            id: track?.id,
+            track: track,
+          };
+        }));
+        return;
+      } catch (e) {
+        sessionStorage.removeItem('ourSongsData');
+      }
+    }
+
     const fetchTracks = async () => {
       try {
         const token = await getValidToken();
@@ -88,11 +107,6 @@ export default function OurSongs() {
           { headers: { 'Authorization': `Bearer ${token}` } }
         );
 
-        if (response.status === 429) {
-          setSongs(prev => prev.map(s => ({ ...s, loading: false, error: 'Demasiadas búsquedas seguidas, espera unos segundos e intenta de nuevo ♡' })));
-          return;
-        }
-
         if (!response.ok) {
           setSongs(prev => prev.map(s => ({ ...s, loading: false })));
           return;
@@ -100,6 +114,7 @@ export default function OurSongs() {
 
         const data = await response.json();
         const tracks = data.tracks || [];
+        sessionStorage.setItem('ourSongsData', JSON.stringify(tracks));
 
         setSongs(SONGS.map((song, i) => {
           const track = tracks[i];
