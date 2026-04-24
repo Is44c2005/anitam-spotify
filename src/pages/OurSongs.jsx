@@ -1,31 +1,35 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchArtistTrack } from '../utils/api';
+import { getValidToken } from '../utils/spotify';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './OurSongs.module.css';
 
 const MAIN_SONGS = [
-  { key: 'ourSong',       artist: 'Mon Laferte',  title: 'My One and Only Love', label: 'la nuestra ♡',   rot: -2   },
-  { key: 'somosDos',      artist: 'Bomba Estéreo', title: 'Somos Dos',            label: 'nos recuerda',    rot:  1.5 },
-  { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love',             label: 'pienso en ti',    rot: -1.5 },
-  { key: 'sundayMorning', artist: 'Maroon 5',      title: 'Sunday Morning', album: 'Songs About Jane', label: 'domingo contigo', rot: 1 },
+  { key: 'ourSong',       id: '3aqwHAGQ19p6xG5n3lUuR8',  label: 'la nuestra ♡',   rot: -2   },
+  { key: 'somosDos',      id: '0h2b4RYMOvVZ2AzFKM1q5P', label: 'nos recuerda',    rot:  1.5 },
+  { key: 'flyLove',       id: '0Gjmr8pnQtSZEakL8qmKJO', label: 'pienso en ti',    rot: -1.5 },
+  { key: 'sundayMorning', id: '0vGv6QJVj4cXF8TvBKVLvC', label: 'domingo contigo', rot: 1   },
 ];
 
 const ALL_SONGS = [
-  { n:  1, artist: 'The Marías',            title: 'Cariño',              label: 'suavecito'    },
-  { n:  2, artist: 'LosPetitFellas',        title: 'Teorías Caos y Besos', label: 'especial'     },
-  { n:  3, artist: 'Latin Mafia',           title: 'neo roneo',           label: 'romántico'    },
-  { n:  4, artist: 'Arctic Monkeys',        title: "Baby I'm Yours",      label: 'tuyo/a'       },
-  { n:  5, artist: 'Michael Jackson',       title: 'You Rock My World',   label: 'clásico'      },
-  { n:  6, artist: 'Grover Washington Jr.', title: 'Just the Two of Us',  label: 'los dos'      },
-  { n:  7, artist: 'Mac Miller',            title: 'My Favorite Part',    label: 'favorita'     },
-  { n:  8, artist: 'Drake',                 title: "Yebba's Heartbreak",  label: 'sentida'      },
-  { n:  9, artist: 'Cigarettes After Sex',  title: 'K',                   label: 'íntima'       },
-  { n: 10, artist: 'Rex Orange County',     title: 'Sunflower',           label: 'alegre'       },
-  { n: 11, artist: 'The Walters',           title: 'I Love You So',       label: 'así te quiero' },
-  { n: 12, artist: 'Bruno Mars',            title: 'After Last Night',    label: 'nuestra'      },
-  { n: 13, artist: 'Childish Gambino',      title: 'Redbone',             label: 'vibra'        },
-  { n: 14, artist: 'Troye Sivan',           title: 'One Of Your Girls',   label: 'solo tuya'    },
+  { n:  1, id: '0ofHAoxe9vBkTCp2UQIavz', label: 'suavecito'     },
+  { n:  2, id: '2JoZzpdeP2G6Csfdq5aLXP', label: 'especial'      },
+  { n:  3, id: '7GVUmCP00eSsqc4tzj1sDD', label: 'romántico'     },
+  { n:  4, id: '5qqabIl2vWzo9ApSC317sa', label: 'tuyo/a'        },
+  { n:  5, id: '2P4OICZRVAQcYAV2JReRfj', label: 'clásico'       },
+  { n:  6, id: '4GKm1QaEr1tqJwUM0EsUl3', label: 'los dos'       },
+  { n:  7, id: '4WefXOf8I4gMjdj2kBJgkl', label: 'favorita'      },
+  { n:  8, id: '5F6ekGcdu623mkhTVgk64Z', label: 'sentida'       },
+  { n:  9, id: '2OcTokSU4FnEaIMpNSAh9F', label: 'íntima'        },
+  { n: 10, id: '0T5iIrXA4p5GsubkhuBIKV', label: 'alegre'        },
+  { n: 11, id: '2qpacEyFxmbxCpIEqZkqvC', label: 'así te quiero'  },
+  { n: 12, id: '7qWfrXUmYD2UG82tI0pfKm', label: 'nuestra'       },
+  { n: 13, id: '35uxk7hvSZBfEgScbcagZI', label: 'vibra'         },
+  { n: 14, id: '3cL9ePuG6NGlmUmXEbOfpG', label: 'solo tuya'     },
+  { n: 15, id: '3t3jGDeU3t1ro51C3x2pPR', label: 'para ti'       },
+  { n: 16, id: '5mg6sU732O35VMfCYk3lmX', label: 'siempre'       },
+  { n: 17, id: '1aBJ5ljG2GalxEl01vQn04', label: 'contigo'       },
+  { n: 18, id: '17LdmV5cIcTvxB0O18tD2Z', label: 'eternamente'   },
 ];
 
 function useReveal() {
@@ -50,24 +54,34 @@ export default function OurSongs() {
   const allRef = useReveal();
 
   useEffect(() => {
-    Promise.allSettled(
-      MAIN_SONGS.map(({ artist, title, album }) => searchArtistTrack(artist, title, album))
-    ).then(results => {
+    const fetchTracks = async (trackIds) => {
+      try {
+        const token = await getValidToken();
+        const response = await fetch(`https://api.spotify.com/v1/tracks?ids=${trackIds.join(',')}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) return {};
+        const data = await response.json();
+        return data.tracks || [];
+      } catch {
+        return [];
+      }
+    };
+
+    fetchTracks(MAIN_SONGS.map(s => s.id)).then(tracks => {
       const found = {};
-      results.forEach((r, i) => {
-        if (r.status === 'fulfilled') found[MAIN_SONGS[i].key] = r.value?.tracks?.items?.[0] ?? null;
+      tracks.forEach((track, i) => {
+        found[MAIN_SONGS[i].key] = track || null;
       });
       setSpotifyTracks(found);
-    }).catch(() => {});
+    });
 
-    Promise.allSettled(
-      ALL_SONGS.map(({ artist, title }) => searchArtistTrack(artist, title))
-    ).then(results => {
-      setAllTracks(results.map((r, i) => ({
-        ...ALL_SONGS[i],
-        track: r.status === 'fulfilled' ? r.value?.tracks?.items?.[0] ?? null : null,
+    fetchTracks(ALL_SONGS.map(s => s.id)).then(tracks => {
+      setAllTracks(ALL_SONGS.map((song, i) => ({
+        ...song,
+        track: tracks[i] || null,
       })));
-    }).catch(() => {});
+    });
   }, []);
 
   function handlePlay(track) {
