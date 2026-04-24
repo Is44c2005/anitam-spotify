@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { getCurrentUser, searchArtistTrack, searchArtist } from '../utils/api';
+import { getCurrentUser, searchArtistTrack, getArtist } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './Home.module.css';
 
@@ -79,7 +79,7 @@ export default function Home() {
       });
       setSpotifyTracks(found);
     });
-    searchArtist('Kris R.').then(d => setSpotifyArtist(d?.artists?.items?.[0] ?? null)).catch(() => {});
+    getArtist('3i6lAgVHplDXb6zrjIeBeK').then(setSpotifyArtist).catch(() => {});
   }, []);
 
   const monthsAnim = useCountUp(months, 1400);

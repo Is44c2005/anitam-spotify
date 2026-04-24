@@ -109,6 +109,10 @@ export async function searchArtist(query, limit = 1) {
   );
 }
 
+export async function getArtist(id) {
+  return fetchSpotify(`/artists/${id}`);
+}
+
 export async function getUserTopTracks(limit = 10) {
   return fetchSpotify(`/me/top/tracks?limit=${parseInt(limit, 10)}&time_range=short_term`);
 }
