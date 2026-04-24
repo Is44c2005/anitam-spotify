@@ -39,6 +39,20 @@ const SONGS = [
   {name:'Preso', artist:'José José'},
 ];
 
+const TRACK_IDS = [
+  '0ofHAoxe9vBkTCp2UQIavz', '2JoZzpdeP2G6Csfdq5aLXP', '7GVUmCP00eSsqc4tzj1sDD',
+  '5qqabIl2vWzo9ApSC317sa', '2P4OICZRVAQcYAV2JReRfj', '4GKm1QaEr1tqJwUM0EsUl3',
+  '4WefXOf8I4gMjdj2kBJgkl', '5F6ekGcdu623mkhTVgk64Z', '2OcTokSU4FnEaIMpNSAh9F',
+  '0T5iIrXA4p5GsubkhuBIKV', '2qpacEyFxmbxCpIEqZkqvC', '7qWfrXUmYD2UG82tI0pfKm',
+  '35uxk7hvSZBfEgScbcagZI', '3cL9ePuG6NGlmUmXEbOfpG', '0ofHAoxe9vBkTCp2UQIavz',
+  '3mM00GfVOfqBYFfPtQPgdm', '4bIzPNFSCWqnKiAXerPIAq', '4wJBWMDkbRUXGQHtkFoFOj',
+  '7nZmah2llfvLDiUjm0kiyz', '3t3jGDeU3t1ro51C3x2pPR', '5mg6sU732O35VMfCYk3lmX',
+  '1aBJ5ljG2GalxEl01vQn04', '17LdmV5cIcTvxB0O18tD2Z', '3t3jGDeU3t1ro51C3x2pPR',
+  '5mg6sU732O35VMfCYk3lmX', '1aBJ5ljG2GalxEl01vQn04', '17LdmV5cIcTvxB0O18tD2Z',
+  '3cL9ePuG6NGlmUmXEbOfpG', '2PgKHMmSYEyDU0HJKWXMAM', '35uxk7hvSZBfEgScbcagZI',
+  '7qWfrXUmYD2UG82tI0pfKm', '2qpacEyFxmbxCpIEqZkqvC',
+];
+
 function useReveal() {
   const ref = useRef(null);
   useEffect(() => {
@@ -60,7 +74,7 @@ export default function OurSongs() {
   const songsRef = useReveal();
 
   useEffect(() => {
-    const searchTracks = async () => {
+    const fetchTracks = async () => {
       try {
         const token = await getValidToken();
         if (!token) {
@@ -68,81 +82,44 @@ export default function OurSongs() {
           return;
         }
 
-        const searchPromises = SONGS.map(async (song) => {
-          try {
-            let response;
+        const ids = TRACK_IDS.join(',');
+        const response = await fetch(
+          `https://api.spotify.com/v1/tracks?ids=${ids}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
 
-            // Corrección 1: Eres - usar Track ID directo
-            if (song.name === 'Eres') {
-              response = await fetch(
-                'https://api.spotify.com/v1/tracks/2PgKHMmSYEyDU0HJKWXMAM',
-                { headers: { 'Authorization': `Bearer ${token}` } }
-              );
-            } else {
-              let query = encodeURIComponent(`${song.name} ${song.artist}`);
-              let limit = 1;
+        if (response.status === 429) {
+          setSongs(prev => prev.map(s => ({ ...s, loading: false, error: 'Demasiadas búsquedas seguidas, espera unos segundos e intenta de nuevo ♡' })));
+          return;
+        }
 
-              // Patadas de Ahogado - filtrar remixes
-              if (song.name === 'Patadas de Ahogado') {
-                limit = 10;
-              }
+        if (!response.ok) {
+          setSongs(prev => prev.map(s => ({ ...s, loading: false })));
+          return;
+        }
 
-              response = await fetch(
-                `https://api.spotify.com/v1/search?q=${query}&type=track&limit=${limit}`,
-                { headers: { 'Authorization': `Bearer ${token}` } }
-              );
-            }
-
-            if (!response.ok) return null;
-            const data = await response.json();
-
-            let track;
-            if (song.name === 'Eres') {
-              track = data;
-            } else {
-              track = data.tracks?.items?.[0];
-
-              // Para Patadas de Ahogado, filtrar remixes
-              if (song.name === 'Patadas de Ahogado' && data.tracks?.items) {
-                track = data.tracks.items.find(t => !t.name.includes('Remix') && !t.name.includes('remix') && !t.name.includes('REMIX')) || data.tracks.items[0];
-              }
-            }
-
-            if (track) {
-              return {
-                coverUrl: track.album?.images?.[1]?.url,
-                uri: track.uri,
-                id: track.id,
-                track: track,
-              };
-            }
-          } catch (error) {
-            console.error(`Error searching ${song.name}:`, error);
-          }
-          return null;
-        });
-
-        const results = await Promise.all(searchPromises);
+        const data = await response.json();
+        const tracks = data.tracks || [];
 
         setSongs(SONGS.map((song, i) => {
-          const result = results[i];
+          const track = tracks[i];
           return {
             ...song,
             n: i + 1,
             loading: false,
-            coverUrl: result?.coverUrl,
-            uri: result?.uri,
-            id: result?.id,
-            track: result?.track,
+            coverUrl: track?.album?.images?.[1]?.url,
+            uri: track?.uri,
+            id: track?.id,
+            track: track,
           };
         }));
       } catch (error) {
-        console.error('Error in searchTracks:', error);
+        console.error('Error fetching tracks:', error);
         setSongs(prev => prev.map(s => ({ ...s, loading: false })));
       }
     };
 
-    searchTracks();
+    fetchTracks();
   }, []);
 
   function getInitials(name) {
