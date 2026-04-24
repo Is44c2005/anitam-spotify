@@ -1,14 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getValidToken } from '../utils/spotify';
+import { searchArtistTrack, getValidToken } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './OurSongs.module.css';
 
 const MAIN_SONGS = [
-  { key: 'ourSong',       id: '3aqwHAGQ19p6xG5n3lUuR8',  label: 'la nuestra ♡',   rot: -2   },
-  { key: 'somosDos',      id: '0h2b4RYMOvVZ2AzFKM1q5P', label: 'nos recuerda',    rot:  1.5 },
-  { key: 'flyLove',       id: '0Gjmr8pnQtSZEakL8qmKJO', label: 'pienso en ti',    rot: -1.5 },
-  { key: 'sundayMorning', id: '0vGv6QJVj4cXF8TvBKVLvC', label: 'domingo contigo', rot: 1   },
+  { key: 'ourSong',       artist: 'Mon Laferte',  title: 'My One and Only Love', label: 'la nuestra ♡',   rot: -2   },
+  { key: 'somosDos',      artist: 'Bomba Estéreo', title: 'Somos Dos',            label: 'nos recuerda',    rot:  1.5 },
+  { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love',             label: 'pienso en ti',    rot: -1.5 },
+  { key: 'sundayMorning', artist: 'Maroon 5',      title: 'Sunday Morning', album: 'Songs About Jane', label: 'domingo contigo', rot: 1 },
 ];
 
 const ALL_SONGS = [
@@ -54,13 +54,13 @@ export default function OurSongs() {
   const allRef = useReveal();
 
   useEffect(() => {
-    const fetchTracks = async (trackIds) => {
+    const fetchTracksById = async (trackIds) => {
       try {
         const token = await getValidToken();
         const response = await fetch(`https://api.spotify.com/v1/tracks?ids=${trackIds.join(',')}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) return {};
+        if (!response.ok) return [];
         const data = await response.json();
         return data.tracks || [];
       } catch {
@@ -68,15 +68,17 @@ export default function OurSongs() {
       }
     };
 
-    fetchTracks(MAIN_SONGS.map(s => s.id)).then(tracks => {
+    Promise.allSettled(
+      MAIN_SONGS.map(({ artist, title, album }) => searchArtistTrack(artist, title, album))
+    ).then(results => {
       const found = {};
-      tracks.forEach((track, i) => {
-        found[MAIN_SONGS[i].key] = track || null;
+      results.forEach((r, i) => {
+        if (r.status === 'fulfilled') found[MAIN_SONGS[i].key] = r.value?.tracks?.items?.[0] ?? null;
       });
       setSpotifyTracks(found);
-    });
+    }).catch(() => {});
 
-    fetchTracks(ALL_SONGS.map(s => s.id)).then(tracks => {
+    fetchTracksById(ALL_SONGS.map(s => s.id)).then(tracks => {
       setAllTracks(ALL_SONGS.map((song, i) => ({
         ...song,
         track: tracks[i] || null,
@@ -138,8 +140,10 @@ export default function OurSongs() {
           <div className={styles.sectionTitle}>todas las nuestras</div>
           <div className={styles.sectionSub}>— nuestra playlist completa ♡</div>
           <div className={styles.trackList}>
-            {allTracks.map(({ n, title, artist, label, track }) => {
+            {allTracks.map(({ n, label, track }) => {
               const coverUrl = track?.album?.images?.[2]?.url;
+              const trackName = track?.name || '—';
+              const artistName = track?.artists?.[0]?.name || '—';
               const active = isPlaying && currentTrack?.id === track?.id;
               return (
                 <div
@@ -150,12 +154,12 @@ export default function OurSongs() {
                 >
                   <span className={styles.trackNum}>{String(n).padStart(2, '0')}</span>
                   {coverUrl
-                    ? <img src={coverUrl} className={styles.trackCover} alt={title} />
+                    ? <img src={coverUrl} className={styles.trackCover} alt={trackName} />
                     : <div className={styles.trackCoverFallback}>♪</div>
                   }
                   <div className={styles.trackInfo}>
-                    <div className={styles.trackName}>{title}</div>
-                    <div className={styles.trackArtist}>{artist}</div>
+                    <div className={styles.trackName}>{trackName}</div>
+                    <div className={styles.trackArtist}>{artistName}</div>
                   </div>
                   <div className={styles.trackLabel}>{label}</div>
                 </div>
