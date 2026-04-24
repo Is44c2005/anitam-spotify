@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getValidToken } from '../utils/api';
+import { getValidToken } from '../utils/spotify';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './OurSongs.module.css';
 
