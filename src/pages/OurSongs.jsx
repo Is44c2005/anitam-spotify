@@ -1,35 +1,28 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { searchArtistTrack, getValidToken } from '../utils/api';
+import { getValidToken } from '../utils/api';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './OurSongs.module.css';
 
-const MAIN_SONGS = [
-  { key: 'ourSong',       artist: 'Mon Laferte',  title: 'My One and Only Love', label: 'la nuestra ♡',   rot: -2   },
-  { key: 'somosDos',      artist: 'Bomba Estéreo', title: 'Somos Dos',            label: 'nos recuerda',    rot:  1.5 },
-  { key: 'flyLove',       artist: 'Jamie Foxx',    title: 'Fly Love',             label: 'pienso en ti',    rot: -1.5 },
-  { key: 'sundayMorning', artist: 'Maroon 5',      title: 'Sunday Morning', album: 'Songs About Jane', label: 'domingo contigo', rot: 1 },
-];
-
-const ALL_SONGS = [
-  { n:  1, id: '0ofHAoxe9vBkTCp2UQIavz', label: 'suavecito'     },
-  { n:  2, id: '2JoZzpdeP2G6Csfdq5aLXP', label: 'especial'      },
-  { n:  3, id: '7GVUmCP00eSsqc4tzj1sDD', label: 'romántico'     },
-  { n:  4, id: '5qqabIl2vWzo9ApSC317sa', label: 'tuyo/a'        },
-  { n:  5, id: '2P4OICZRVAQcYAV2JReRfj', label: 'clásico'       },
-  { n:  6, id: '4GKm1QaEr1tqJwUM0EsUl3', label: 'los dos'       },
-  { n:  7, id: '4WefXOf8I4gMjdj2kBJgkl', label: 'favorita'      },
-  { n:  8, id: '5F6ekGcdu623mkhTVgk64Z', label: 'sentida'       },
-  { n:  9, id: '2OcTokSU4FnEaIMpNSAh9F', label: 'íntima'        },
-  { n: 10, id: '0T5iIrXA4p5GsubkhuBIKV', label: 'alegre'        },
-  { n: 11, id: '2qpacEyFxmbxCpIEqZkqvC', label: 'así te quiero'  },
-  { n: 12, id: '7qWfrXUmYD2UG82tI0pfKm', label: 'nuestra'       },
-  { n: 13, id: '35uxk7hvSZBfEgScbcagZI', label: 'vibra'         },
-  { n: 14, id: '3cL9ePuG6NGlmUmXEbOfpG', label: 'solo tuya'     },
-  { n: 15, id: '3t3jGDeU3t1ro51C3x2pPR', label: 'para ti'       },
-  { n: 16, id: '5mg6sU732O35VMfCYk3lmX', label: 'siempre'       },
-  { n: 17, id: '1aBJ5ljG2GalxEl01vQn04', label: 'contigo'       },
-  { n: 18, id: '17LdmV5cIcTvxB0O18tD2Z', label: 'eternamente'   },
+const SONGS = [
+  {n:1, id:'0ofHAoxe9vBkTCp2UQIavz', name:'Cariño', artist:'The Marías', vibe:'suavecito'},
+  {n:2, id:'2JoZzpdeP2G6Csfdq5aLXP', name:'Teorías Caos y Besos', artist:'LosPetitFellas', vibe:'especial'},
+  {n:3, id:'7GVUmCP00eSsqc4tzj1sDD', name:'neo roneo', artist:'Latin Mafia', vibe:'romántico'},
+  {n:4, id:'5qqabIl2vWzo9ApSC317sa', name:"Baby I'm Yours", artist:'Arctic Monkeys', vibe:'tuyo/a'},
+  {n:5, id:'2P4OICZRVAQcYAV2JReRfj', name:'You Rock My World', artist:'Michael Jackson', vibe:'clásico'},
+  {n:6, id:'4GKm1QaEr1tqJwUM0EsUl3', name:'Just the Two of Us', artist:'Grover Washington Jr.', vibe:'los dos'},
+  {n:7, id:'4WefXOf8I4gMjdj2kBJgkl', name:'My Favorite Part', artist:'Mac Miller', vibe:'favorita'},
+  {n:8, id:'5F6ekGcdu623mkhTVgk64Z', name:"Yebba's Heartbreak", artist:'Drake', vibe:'sentida'},
+  {n:9, id:'2OcTokSU4FnEaIMpNSAh9F', name:'K', artist:'Cigarettes After Sex', vibe:'íntima'},
+  {n:10, id:'0T5iIrXA4p5GsubkhuBIKV', name:'Sunflower', artist:'Rex Orange County', vibe:'alegre'},
+  {n:11, id:'2qpacEyFxmbxCpIEqZkqvC', name:'I Love You So', artist:'The Walters', vibe:'así te quiero'},
+  {n:12, id:'7qWfrXUmYD2UG82tI0pfKm', name:'After Last Night', artist:'Bruno Mars', vibe:'nuestra'},
+  {n:13, id:'35uxk7hvSZBfEgScbcagZI', name:'Redbone', artist:'Childish Gambino', vibe:'vibra'},
+  {n:14, id:'3cL9ePuG6NGlmUmXEbOfpG', name:'One Of Your Girls', artist:'Troye Sivan', vibe:'solo tuya'},
+  {n:15, id:'3t3jGDeU3t1ro51C3x2pPR', name:'Canción nueva 15', artist:'Artista', vibe:'especial'},
+  {n:16, id:'5mg6sU732O35VMfCYk3lmX', name:'Canción nueva 16', artist:'Artista', vibe:'especial'},
+  {n:17, id:'1aBJ5ljG2GalxEl01vQn04', name:'Canción nueva 17', artist:'Artista', vibe:'especial'},
+  {n:18, id:'17LdmV5cIcTvxB0O18tD2Z', name:'Canción nueva 18', artist:'Artista', vibe:'especial'},
 ];
 
 function useReveal() {
@@ -47,47 +40,47 @@ function useReveal() {
 export default function OurSongs() {
   const navigate = useNavigate();
   const { play, currentTrack, isPlaying } = usePlayer();
-  const [spotifyTracks, setSpotifyTracks] = useState({});
-  const [allTracks, setAllTracks] = useState([]);
+  const [songs, setSongs] = useState(SONGS);
 
-  const mainRef = useReveal();
-  const allRef = useReveal();
+  const songsRef = useReveal();
 
   useEffect(() => {
-    const fetchTracksById = async (trackIds) => {
+    const fetchTracks = async () => {
       try {
         const token = await getValidToken();
-        const response = await fetch(`https://api.spotify.com/v1/tracks?ids=${trackIds.join(',')}`, {
+        const ids = SONGS.map(s => s.id).join(',');
+        const response = await fetch(`https://api.spotify.com/v1/tracks?ids=${ids}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) return [];
+        if (!response.ok) throw new Error('fetch failed');
         const data = await response.json();
-        return data.tracks || [];
+        const tracks = data.tracks || [];
+        setSongs(SONGS.map((song, i) => {
+          const track = tracks[i];
+          return {
+            ...song,
+            spotifyName: track?.name,
+            spotifyArtist: track?.artists?.[0]?.name,
+            coverUrl: track?.album?.images?.[0]?.url,
+            trackObj: track,
+          };
+        }));
       } catch {
-        return [];
+        setSongs(SONGS);
       }
     };
-
-    Promise.allSettled(
-      MAIN_SONGS.map(({ artist, title, album }) => searchArtistTrack(artist, title, album))
-    ).then(results => {
-      const found = {};
-      results.forEach((r, i) => {
-        if (r.status === 'fulfilled') found[MAIN_SONGS[i].key] = r.value?.tracks?.items?.[0] ?? null;
-      });
-      setSpotifyTracks(found);
-    }).catch(() => {});
-
-    fetchTracksById(ALL_SONGS.map(s => s.id)).then(tracks => {
-      setAllTracks(ALL_SONGS.map((song, i) => ({
-        ...song,
-        track: tracks[i] || null,
-      })));
-    });
+    fetchTracks();
   }, []);
 
-  function handlePlay(track) {
-    if (track) play(track);
+  function getInitials(name) {
+    return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  function getColorFromName(name) {
+    const colors = ['#F5AFAF', '#F9DFDF', '#FBEFEF', '#c47a7a', '#7a5555'];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return colors[Math.abs(hash) % colors.length];
   }
 
   return (
@@ -106,62 +99,33 @@ export default function OurSongs() {
           </h1>
         </div>
 
-        <section ref={mainRef} className={`${styles.section} reveal`}>
-          <div className={styles.sectionTitle}>las principales ♡</div>
-          <div className={styles.sectionSub}>— las que más nos definen</div>
-          <div className={styles.songsGrid}>
-            {MAIN_SONGS.map(({ key, label, rot, fallbackName, fallbackArtist }) => {
-              const track = spotifyTracks[key];
-              const coverUrl = track?.album?.images?.[0]?.url;
-              const name = track?.name || fallbackName;
-              const artist = track?.artists?.[0]?.name || fallbackArtist;
-              const active = isPlaying && currentTrack?.id === track?.id;
-              return (
-                <div
-                  key={key}
-                  className={`${styles.songCard} ${active ? styles.songCardActive : ''}`}
-                  style={{ transform: `rotate(${rot}deg)`, cursor: track ? 'pointer' : 'default' }}
-                  onClick={() => handlePlay(track)}
-                >
-                  {coverUrl
-                    ? <img src={coverUrl} alt={name} className={styles.songCardImg} />
-                    : <div className={styles.songCardCover}>♪</div>
-                  }
-                  <div className={styles.songCardPill}>{label}</div>
-                  <div className={styles.songCardName}>{name}</div>
-                  <div className={styles.songCardArtist}>{artist}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        <section ref={allRef} className={`${styles.section} reveal`}>
+        <section ref={songsRef} className={`${styles.section} reveal`}>
           <div className={styles.sectionTitle}>todas las nuestras</div>
           <div className={styles.sectionSub}>— nuestra playlist completa ♡</div>
           <div className={styles.trackList}>
-            {allTracks.map(({ n, label, track }) => {
-              const coverUrl = track?.album?.images?.[2]?.url;
-              const trackName = track?.name || '—';
-              const artistName = track?.artists?.[0]?.name || '—';
-              const active = isPlaying && currentTrack?.id === track?.id;
+            {songs.map(({ n, vibe, name, artist, coverUrl, trackObj, spotifyName, spotifyArtist }) => {
+              const displayName = spotifyName || name;
+              const displayArtist = spotifyArtist || artist;
+              const active = isPlaying && currentTrack?.id === trackObj?.id;
+              const initials = getInitials(displayName);
+              const bgColor = getColorFromName(displayName);
               return (
                 <div
                   key={n}
                   className={`${styles.trackRow} ${active ? styles.trackRowActive : ''}`}
-                  onClick={() => track && play(track)}
-                  style={{ cursor: track ? 'pointer' : 'default' }}
+                  onClick={() => trackObj && play(trackObj)}
+                  style={{ cursor: trackObj ? 'pointer' : 'default' }}
                 >
                   <span className={styles.trackNum}>{String(n).padStart(2, '0')}</span>
                   {coverUrl
-                    ? <img src={coverUrl} className={styles.trackCover} alt={trackName} />
-                    : <div className={styles.trackCoverFallback}>♪</div>
+                    ? <img src={coverUrl} className={styles.trackCover} alt={displayName} />
+                    : <div className={styles.trackCoverFallback} style={{backgroundColor: bgColor}}>{initials}</div>
                   }
                   <div className={styles.trackInfo}>
-                    <div className={styles.trackName}>{trackName}</div>
-                    <div className={styles.trackArtist}>{artistName}</div>
+                    <div className={styles.trackName}>{displayName}</div>
+                    <div className={styles.trackArtist}>{displayArtist}</div>
                   </div>
-                  <div className={styles.trackLabel}>{label}</div>
+                  <div className={styles.trackLabel}>{vibe}</div>
                 </div>
               );
             })}
