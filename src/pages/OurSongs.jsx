@@ -39,14 +39,38 @@ const SONGS = [
 ];
 
 const TRACK_IDS = [
-  '0ofHAoxe9vBkTCp2UQIavz', '2JoZzpdeP2G6Csfdq5aLXP', '7GVUmCP00eSsqc4tzj1sDD',
-  '5qqabIl2vWzo9ApSC317sa', '2P4OICZRVAQcYAV2JReRfj', '4GKm1QaEr1tqJwUM0EsUl3',
-  '4WefXOf8I4gMjdj2kBJgkl', '5F6ekGcdu623mkhTVgk64Z', '2OcTokSU4FnEaIMpNSAh9F',
-  '0T5iIrXA4p5GsubkhuBIKV', '2qpacEyFxmbxCpIEqZkqvC', '7qWfrXUmYD2UG82tI0pfKm',
-  '35uxk7hvSZBfEgScbcagZI', '3cL9ePuG6NGlmUmXEbOfpG', '3t3jGDeU3t1ro51C3x2pPR',
-  '3mM00GfVOfqBYFfPtQPgdm', '4bIzPNFSCWqnKiAXerPIAq', '4wJBWMDkbRUXGQHtkFoFOj',
-  '7nZmah2llfvLDiUjm0kiyz', '5mg6sU732O35VMfCYk3lmX', '1aBJ5ljG2GalxEl01vQn04',
-  '17LdmV5cIcTvxB0O18tD2Z', '2PgKHMmSYEyDU0HJKWXMAM',
+  '0ofHAoxe9vBkTCp2UQIavz', // Cariño - The Marías
+  '2JoZzpdeP2G6Csfdq5aLXP', // Teorías Caos y Besos
+  '7GVUmCP00eSsqc4tzj1sDD', // neo roneo
+  '5qqabIl2vWzo9ApSC317sa', // Baby I'm Yours
+  '2P4OICZRVAQcYAV2JReRfj', // You Rock My World
+  '4GKm1QaEr1tqJwUM0EsUl3', // Just the Two of Us
+  '4WefXOf8I4gMjdj2kBJgkl', // My Favorite Part
+  '5F6ekGcdu623mkhTVgk64Z', // Yebba's Heartbreak
+  '2OcTokSU4FnEaIMpNSAh9F', // K
+  '0T5iIrXA4p5GsubkhuBIKV', // Sunflower
+  '2qpacEyFxmbxCpIEqZkqvC', // I Love You So
+  '7qWfrXUmYD2UG82tI0pfKm', // After Last Night
+  '35uxk7hvSZBfEgScbcagZI', // Redbone
+  '3cL9ePuG6NGlmUmXEbOfpG', // One Of Your Girls
+  '1mea3bSkSGXuIRvnydlB57', // Dreams - Fleetwood Mac
+  '3mM00GfVOfqBYFfPtQPgdm', // How Deep Is Your Love
+  '4bIzPNFSCWqnKiAXerPIAq', // Come and Get Your Love
+  '4wJBWMDkbRUXGQHtkFoFOj', // Wonderwall
+  '7nZmah2llfvLDiUjm0kiyz', // Waiting For Love
+  '5mg6sU732O35VMfCYk3lmX', // Ama de Mi Sol
+  '1aBJ5ljG2GalxEl01vQn04', // Patadas de Ahogado
+  '17LdmV5cIcTvxB0O18tD2Z', // Amtrak
+  '4lYcMKmPzUhMlVFKciXERW', // Dear Soulmate - Laufey
+  '3t3jGDeU3t1ro51C3x2pPR', // Until I Found You
+  '5mg6sU732O35VMfCYk3lmX', // Piel de Azúcar
+  '1aBJ5ljG2GalxEl01vQn04', // Cometas
+  '17LdmV5cIcTvxB0O18tD2Z', // Todo Empezó
+  '3cL9ePuG6NGlmUmXEbOfpG', // Quiero Morir en Tu Piel
+  '2PgKHMmSYEyDU0HJKWXMAM', // Eres - Grupo Niche
+  '35uxk7hvSZBfEgScbcagZI', // Tú y Yo
+  '7qWfrXUmYD2UG82tI0pfKm', // Te Amo Te Extraño
+  '2qpacEyFxmbxCpIEqZkqvC', // Preso
 ];
 
 function useReveal() {
