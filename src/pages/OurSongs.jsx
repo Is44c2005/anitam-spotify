@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getValidToken } from '../utils/spotify';
 import { usePlayer } from '../hooks/usePlayer';
 import styles from './OurSongs.module.css';
 
@@ -71,23 +70,30 @@ export default function OurSongs() {
   const songsRef = useReveal();
 
   useEffect(() => {
-    sessionStorage.removeItem('ourSongsData');
-
-    const fetchTracks = async () => {
+    const loadTracks = async () => {
       try {
-        const token = await getValidToken();
+        const ids = TRACK_IDS.join(',');
+
+        const BASE = 'https://api.spotify.com/v1';
+        const token = localStorage.getItem('spotify_access_token');
+
         if (!token) {
           setSongs(prev => prev.map(s => ({ ...s, loading: false })));
           return;
         }
 
-        const ids = TRACK_IDS.join(',');
         const response = await fetch(
-          `https://api.spotify.com/v1/tracks?ids=${ids}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
+          `${BASE}/tracks?ids=${ids}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
         );
 
         if (!response.ok) {
+          console.error('Spotify API error:', response.status);
           setSongs(prev => prev.map(s => ({ ...s, loading: false })));
           return;
         }
@@ -97,23 +103,24 @@ export default function OurSongs() {
 
         setSongs(SONGS.map((song, i) => {
           const track = tracks[i];
+          const coverUrl = track?.album?.images?.[0]?.url || null;
           return {
             ...song,
             n: i + 1,
             loading: false,
-            coverUrl: track?.album?.images?.[0]?.url,
+            coverUrl,
             uri: track?.uri,
             id: track?.id,
             track: track,
           };
         }));
       } catch (error) {
-        console.error('Error fetching tracks:', error);
+        console.error('Error loading tracks:', error);
         setSongs(prev => prev.map(s => ({ ...s, loading: false })));
       }
     };
 
-    fetchTracks();
+    loadTracks();
   }, []);
 
   function getInitials(name) {
