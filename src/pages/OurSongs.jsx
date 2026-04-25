@@ -71,27 +71,7 @@ export default function OurSongs() {
   const songsRef = useReveal();
 
   useEffect(() => {
-    const cached = sessionStorage.getItem('ourSongsData');
-    if (cached) {
-      try {
-        const tracks = JSON.parse(cached);
-        setSongs(SONGS.map((song, i) => {
-          const track = tracks[i];
-          return {
-            ...song,
-            n: i + 1,
-            loading: false,
-            coverUrl: track?.album?.images?.[1]?.url,
-            uri: track?.uri,
-            id: track?.id,
-            track: track,
-          };
-        }));
-        return;
-      } catch (e) {
-        sessionStorage.removeItem('ourSongsData');
-      }
-    }
+    sessionStorage.removeItem('ourSongsData');
 
     const fetchTracks = async () => {
       try {
@@ -114,7 +94,6 @@ export default function OurSongs() {
 
         const data = await response.json();
         const tracks = data.tracks || [];
-        sessionStorage.setItem('ourSongsData', JSON.stringify(tracks));
 
         setSongs(SONGS.map((song, i) => {
           const track = tracks[i];
@@ -122,7 +101,7 @@ export default function OurSongs() {
             ...song,
             n: i + 1,
             loading: false,
-            coverUrl: track?.album?.images?.[1]?.url,
+            coverUrl: track?.album?.images?.[0]?.url,
             uri: track?.uri,
             id: track?.id,
             track: track,
