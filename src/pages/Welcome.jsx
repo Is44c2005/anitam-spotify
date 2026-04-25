@@ -137,6 +137,11 @@ export default function Welcome() {
               </svg>
             </div>
             <div className={`${styles.cassettePhrase} ${styles.fadeInUp}`}>para mi Clic ♡</div>
+            <div className={styles.cassetteBars}>
+              {[0, 0.1, 0.2].map((d, i) => (
+                <span key={i} className={styles.cassettBar} style={{ animationDelay: `${d}s` }} />
+              ))}
+            </div>
           </div>
         </div>
 

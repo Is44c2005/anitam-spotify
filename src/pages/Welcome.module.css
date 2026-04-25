@@ -132,6 +132,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  height: 100%;
   --rot: -1.5deg;
   box-shadow: 2px 4px 0 rgba(58, 32, 32, 0.06), 0 10px 22px rgba(58, 32, 32, 0.05);
   animation: revealUp .9s ease .8s both, floatCard 10s ease-in-out 1.5s infinite;
@@ -551,6 +553,23 @@
   text-align: center;
   margin-top: 12px;
   animation-delay: 0.3s;
+}
+
+.cassetteBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+  margin-top: 8px;
+}
+
+.cassettBar {
+  display: inline-block;
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: #F5AFAF;
+  animation: fpBarPulse 0.7s ease-in-out infinite alternate;
 }
 
 /* ── Responsive ── */
